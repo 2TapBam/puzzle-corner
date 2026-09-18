@@ -157,9 +157,14 @@
   }
   .etile:active{filter:brightness(1.15);}
   .etile.rock{cursor:default;}
-  .etile.pivot i, .etile.pivot .base{clip-path:none;border-radius:50%;}
-  .etile.pivot i{box-shadow:inset 0 0 0 3px rgba(255,255,255,.85), inset -2px -3px 0 rgba(0,0,0,.3);}
-  .etile.pivot .arw{color:#fff;}
+  .etile.pivot .base{filter:brightness(.78);}
+  .etile.pivot i{box-shadow:none;}
+  .etile .tok{
+    position:absolute;inset:19%;border-radius:50%;background:#16141f;z-index:3;
+    display:flex;align-items:center;justify-content:center;
+    color:#fff;font-size:21px;font-weight:700;pointer-events:none;
+    box-shadow:0 0 0 3px #fff, 0 3px 7px rgba(0,0,0,.45);
+  }
   .etile.rock:active{filter:none;}
   .ehole{position:absolute;transform:translate(-50%,-50%);pointer-events:none;}
   .ehole .base{
@@ -1125,11 +1130,10 @@ const Escape = (()=>{
     const contents=ring.map(([q,r])=>tiles.get(k(q,r))||null);
     const el0=$('escboard').querySelector('[data-k="'+key+'"]');
     moves++;
-    if(contents.some(c=>c && (c.rock||c.pivot))){        // anchored by a rock or another pivot
+    if(!contents.some(Boolean)){                          // nothing around it to turn
       history.push(snap());
       Sfx.blocked(); buzz(30); updateHud();
       if(el0){ el0.classList.add('shake'); setTimeout(()=>el0.classList.remove('shake'),300); }
-      setHint('That one is anchored — a rock or another pivot is in its ring.');
       afterMove(); return;
     }
     history.push(snap());
@@ -1150,7 +1154,9 @@ const Escape = (()=>{
       for(let i=0;i<6;i++){
         const c=contents[i]; if(!c) continue;
         const [tq,tr]=ring[(i+1)%6];
-        tiles.set(k(tq,tr), Object.assign({}, c, {q:tq, r:tr, d:(c.d+1)%6}));
+        const moved=Object.assign({}, c, {q:tq, r:tr});
+        if(typeof c.d==='number') moved.d=(c.d+1)%6;      // arrows turn with the piece
+        tiles.set(k(tq,tr), moved);
       }
       busy=false; updateHud(); render(); setHint(baseHint()); afterMove();
     },260);
@@ -1160,8 +1166,7 @@ const Escape = (()=>{
     for(const [key,t] of tiles){
       if(t.rock) continue;
       if(t.pivot){
-        const c=ringOf(t.q,t.r).map(([a,b])=>tiles.get(k(a,b))||null);
-        if(!c.some(x=>x&&(x.rock||x.pivot)) && c.some(Boolean)) return true;
+        if(ringOf(t.q,t.r).some(([a,b])=>tiles.has(k(a,b)))) return true;
         continue;
       }
       const occ=new Set(tiles.keys()); occ.delete(key);
@@ -1238,13 +1243,14 @@ const Escape = (()=>{
       el.className='etile'+(t.rock?' rock':'')+(t.pivot?' pivot':'')+(armed?' armed':'');
       const base=document.createElement('div'); base.className='base';
       const i=document.createElement('i');
-      const col = t.rock ? '#4a4660' : (t.pivot ? '#1d1b2b' : 'var('+COLORS[t.c]+')');
+      const col = t.rock ? '#4a4660' : (t.pivot ? 'var(--cell)' : 'var('+COLORS[t.c]+')');
       base.style.setProperty('--tc',col); i.style.setProperty('--tc',col);
       el.appendChild(base); el.appendChild(i);
-      const a=document.createElement('div'); a.className='arw';
+      const a=document.createElement('div');
+      if(t.pivot){ a.className='tok'; a.textContent='↻'; }
+      else { a.className='arw'; }
       if(t.rock){ a.textContent='✕'; a.style.opacity='.55'; }
-      else if(t.pivot){ a.textContent='↻'; a.style.fontSize='26px'; }
-      else{
+      else if(!t.pivot){
         const [dq,dr]=DIRS[t.d];
         a.textContent='➜';
         a.style.transform='rotate('+(Math.atan2(1.5*dr, SQ3*(dq+dr/2))*180/Math.PI)+'deg)';

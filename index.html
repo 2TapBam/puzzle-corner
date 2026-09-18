@@ -18,11 +18,17 @@
     --font:'Fredoka', system-ui, -apple-system, 'Segoe UI', sans-serif;
     --c1:#ef476f; --c2:#ffd166; --c3:#06d6a0; --c4:#3a86ff; --c5:#f78c6b;
     --c6:#c77dff; --c7:#8ac926; --c8:#ff9e00; --c9:#4cc9f0; --c10:#f72585;
+    --bgglow:#241f3a; --wash:rgba(255,255,255,.05); --cell:#2b2740;
+  }
+  :root[data-theme="light"]{
+    --ground:#eceaf6; --surface:#ffffff; --surface2:#f7f6fd; --line:#dcdaec;
+    --text:#2b2842; --muted:#6d6890;
+    --bgglow:#ffffff; --wash:rgba(0,0,0,.05); --cell:#c6c3d9;
   }
   html,body{height:100%;}
   body{
     margin:0;
-    background:radial-gradient(1200px 600px at 50% -10%, #241f3a 0%, rgba(36,31,58,0) 60%), var(--ground);
+    background:radial-gradient(1200px 600px at 50% -10%, var(--bgglow) 0%, transparent 60%), var(--ground);
     color:var(--text); font-family:var(--font);
     -webkit-tap-highlight-color:transparent; user-select:none; -webkit-user-select:none;
     overscroll-behavior:none;
@@ -70,7 +76,7 @@
   .gamecard:active{transform:scale(.98);}
   .gamecard .emoji{
     width:60px;height:60px;flex:none;border-radius:18px;display:flex;
-    align-items:center;justify-content:center;font-size:32px;background:rgba(255,255,255,.06);
+    align-items:center;justify-content:center;font-size:32px;background:var(--wash);
   }
   .gamecard .txt b{display:block;font-size:20px;font-weight:600;}
   .gamecard .txt span{color:var(--muted);font-size:14px;}
@@ -86,7 +92,7 @@
   .tubes{display:flex;flex-wrap:wrap;gap:14px 16px;justify-content:center;align-content:center;padding:8px;max-width:100%;}
   .tube{
     width:52px;padding:7px 6px 8px;border-radius:0 0 22px 22px;
-    background:rgba(255,255,255,.05);border:2px solid var(--line);border-top:none;
+    background:var(--wash);border:2px solid var(--line);border-top:none;
     display:flex;flex-direction:column-reverse;gap:6px;position:relative;transition:transform .12s ease;
   }
   .tube::before{content:"";position:absolute;left:-2px;right:-2px;top:-14px;height:14px;border:2px solid var(--line);border-bottom:none;border-radius:8px 8px 0 0;}
@@ -115,7 +121,7 @@
     display:grid;gap:3px;touch-action:none;
     background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:6px;
   }
-  .cell{position:relative;aspect-ratio:1/1;border-radius:7px;background:rgba(255,255,255,.035);}
+  .cell{position:relative;aspect-ratio:1/1;border-radius:7px;background:var(--wash);}
   .cell .dot{
     position:absolute;inset:16%;border-radius:50%;background:var(--pc,#666);z-index:3;
     box-shadow:inset -3px -4px 0 rgba(0,0,0,.2), inset 3px 3px 0 rgba(255,255,255,.28);
@@ -127,6 +133,47 @@
   .cell .lk.l{top:35%;height:30%;left:0;width:50%;}
   .cell .lk.r{top:35%;height:30%;left:50%;width:50%;}
   .cell.done .dot{box-shadow:inset -3px -4px 0 rgba(0,0,0,.2), inset 3px 3px 0 rgba(255,255,255,.28), 0 0 0 3px rgba(255,255,255,.55);}
+
+  /* ---- hexa escape ---- */
+  #escWrap{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+  .escboard{position:relative;margin:auto;}
+  .etile{position:absolute;transform:translate(-50%,-50%);cursor:pointer;}
+  .etile .base{
+    position:absolute;inset:0;display:block;background:var(--tc,#666);
+    clip-path:polygon(50% 1%,100% 25%,100% 75%,50% 99%,0 75%,0 25%);
+    transform:translateY(10%);filter:brightness(.55);
+  }
+  .etile i{
+    position:absolute;inset:0;display:block;background:var(--tc,#666);
+    clip-path:polygon(50% 1%,100% 25%,100% 75%,50% 99%,0 75%,0 25%);
+    box-shadow:inset -3px -4px 0 rgba(0,0,0,.18), inset 4px 5px 0 rgba(255,255,255,.3);
+  }
+  @keyframes armpulse{0%,100%{filter:brightness(1)}50%{filter:brightness(1.35)}}
+  .etile.armed{animation:armpulse .9s ease-in-out infinite;}
+  .etile .arw{
+    position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    font-size:20px;color:#fff;font-weight:700;z-index:2;pointer-events:none;
+    text-shadow:0 1px 3px rgba(0,0,0,.4);
+  }
+  .etile:active{filter:brightness(1.15);}
+  .etile.rock{cursor:default;}
+  .etile.pivot i, .etile.pivot .base{clip-path:none;border-radius:50%;}
+  .etile.pivot i{box-shadow:inset 0 0 0 3px rgba(255,255,255,.85), inset -2px -3px 0 rgba(0,0,0,.3);}
+  .etile.pivot .arw{color:#fff;}
+  .etile.rock:active{filter:none;}
+  .ehole{position:absolute;transform:translate(-50%,-50%);pointer-events:none;}
+  .ehole .base{
+    position:absolute;inset:0;display:block;background:var(--cell);
+    clip-path:polygon(50% 1%,100% 25%,100% 75%,50% 99%,0 75%,0 25%);
+    transform:translateY(9%);filter:brightness(.78);
+  }
+  .ehole i{
+    position:absolute;inset:0;display:block;background:var(--cell);
+    clip-path:polygon(50% 1%,100% 25%,100% 75%,50% 99%,0 75%,0 25%);
+  }
+  @keyframes eshake{0%,100%{transform:translate(-50%,-50%)}25%{transform:translate(-58%,-50%)}75%{transform:translate(-42%,-50%)}}
+  .etile.shake{animation:eshake .26s ease;}
+  .etile.fly{transition:transform .32s cubic-bezier(.4,0,.9,.4), opacity .32s ease;opacity:0;}
 
   /* ---- level select ---- */
   .lvgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;overflow-y:auto;padding-bottom:16px;align-content:start;flex:1;}
@@ -182,6 +229,11 @@
         <span class="txt"><b>Flow</b><span>Join the matching dots and fill the board</span></span>
         <span class="go">›</span>
       </button>
+      <button class="gamecard" data-go="escape">
+        <span class="emoji">➡️</span>
+        <span class="txt"><b>Hexa Escape</b><span>Clear a path so every hexagon can fly off</span></span>
+        <span class="go">›</span>
+      </button>
       <button class="gamecard" id="dailyCard">
         <span class="emoji">🗓️</span>
         <span class="txt"><b>Daily Challenge</b><span id="dailySub">One puzzle a day</span></span>
@@ -191,6 +243,7 @@
     <div class="menufoot">
       <div class="pill gold">★ <span id="menuStars">0</span></div>
       <button class="iconbtn" data-sfx>🔊</button>
+      <button class="iconbtn" id="themeBtn">🌙</button>
     </div>
   </section>
 
@@ -241,6 +294,32 @@
     </div>
     <div class="hint" id="flowHint">Drag from a dot to its twin. Fill every square to win.</div>
     <div id="flowWrap"><div class="flowgrid" id="flowgrid"></div></div>
+  </section>
+
+  <!-- ===== HEXA ESCAPE ===== -->
+  <section id="escape" class="stage" hidden>
+    <div class="bar">
+      <button class="iconbtn" data-home>‹ Menu</button>
+      <div class="spacer"></div>
+      <div class="pill"><small>Left</small> <span id="escLeft">0</span></div>
+      <div class="pill"><small>Moves</small> <span id="escMoves">0</span><small>/ par</small> <span id="escPar">0</span></div>
+    </div>
+    <div class="bar" style="margin-bottom:4px;">
+      <button class="iconbtn" id="escUndo">↶</button>
+      <button class="iconbtn" id="escRestart">↻</button>
+      <button class="iconbtn" data-levels="escape">☰</button>
+      <button class="iconbtn" data-sfx>🔊</button>
+      <div class="spacer"></div>
+      <div class="pill"><small>Level</small> <span id="escLevel">1</span></div>
+    </div>
+    <div class="bar" style="margin-bottom:4px;">
+      <button class="iconbtn" id="escHammer">🔨<small style="color:var(--accent)">2★</small></button>
+      <button class="iconbtn" id="escBomb">💣<small style="color:var(--accent)">3★</small></button>
+      <div class="spacer"></div>
+      <div class="pill gold">★ <span id="escStars">0</span></div>
+    </div>
+    <div class="hint" id="escHint">Clear path? It flies off. Blocked? It slides up to the blocker and stays.</div>
+    <div id="escWrap"><div class="escboard" id="escboard"></div></div>
   </section>
 
   <!-- ===== LEVEL SELECT ===== -->
@@ -324,6 +403,9 @@ const Sfx = (()=>{
     link(n){ tone(380+Math.min(n,14)*22,.05,'triangle',.05); },
     connect(){ tone(760,.13,'triangle',.09); },
     buy(){ tone(880,.1,'triangle',.09); tone(1180,.12,'triangle',.07,.07); },
+    slide(){ tone(880,.16,'triangle',.07); tone(420,.12,'sine',.05,.04); },
+    blocked(){ tone(150,.13,'square',.06); },
+    boom(){ tone(140,.3,'sawtooth',.11); tone(80,.36,'sine',.09,.05); },
     nope(){ tone(180,.16,'sawtooth',.06); },
     done(){ [523,659,784,1047].forEach((f,i)=>tone(f,.22,'sine',.09,i*.09)); }
   };
@@ -349,17 +431,20 @@ const Stars = (()=>{
     },
     sync(){
       const t=total;
-      ['menuStars','ballStars','flowStars','lvStars'].forEach(id=>{ const e=$(id); if(e) e.textContent=t; });
+      ['menuStars','ballStars','flowStars','escStars','lvStars'].forEach(id=>{ const e=$(id); if(e) e.textContent=t; });
       const bt=$('buyTube'), bh=$('buyHint'), fh=$('flowHintBtn');
       if(bt) bt.disabled = t<3;
       if(bh) bh.disabled = t<2;
       if(fh) fh.disabled = t<2;
+      const eh=$('escHammer'), eb=$('escBomb');
+      if(eh) eh.disabled = t<2;
+      if(eb) eb.disabled = t<3;
     }
   };
 })();
 
 /* ---------- screens ---------- */
-const screens = { menu:$('menu'), ball:$('ball'), flow:$('flow'), levels:$('levels') };
+const screens = { menu:$('menu'), ball:$('ball'), flow:$('flow'), escape:$('escape'), levels:$('levels') };
 function show(name){
   for(const k in screens) screens[k].hidden = (k!==name);
   hideOverlay();
@@ -367,6 +452,7 @@ function show(name){
   if(name==='menu') Daily.syncCard();
   if(name==='ball') Ball.enter();
   if(name==='flow') Flow.enter();
+  if(name==='escape') Escape.enter();
 }
 document.querySelectorAll('[data-go]').forEach(b=> b.onclick=()=>show(b.dataset.go));
 document.querySelectorAll('[data-home]').forEach(b=> b.onclick=()=>show('menu'));
@@ -857,8 +943,334 @@ const Flow = (()=>{
 })();
 
 /* =========================================================
+   HEXA ESCAPE — tap a tile to fly it out, if its path is clear
+   ========================================================= */
+const Escape = (()=>{
+  const DIRS=[[1,0],[1,-1],[0,-1],[-1,0],[-1,1],[0,1]];   // pointy-top axial
+  const SQ3=Math.sqrt(3);
+  const k=(q,r)=>q+','+r;
+  let board=new Set(), cells=[], tiles=new Map();
+  let level=1, moves=0, par=0, budget=0, busy=false, history=[], assisted=false, armed=null;
+  let mode='level', pendingDaily=null, lastSize=40;
+
+  function boardSizeFor(l){ return Math.min(12 + Math.floor((l-1)/6), 54); }
+  function rocksFor(l){ return Math.min(Math.floor(l/15), 6); }
+  function pivotsFor(l){ return l<25 ? 0 : (l<120 ? 1 : 2); }
+  const ringOf=(q,r)=>DIRS.map(([dq,dr])=>[q+dq,r+dr]);
+  function maxRad(n){ return n<=19 ? 2 : (n<=37 ? 3 : 4); }
+
+  // grow an irregular connected blob of cells — corridors, holes, odd shapes
+  function growBoard(n, rnd){
+    const R=maxRad(n), set=new Set([k(0,0)]), list=[[0,0]];
+    let guard=0;
+    while(list.length<n && guard++ < n*200){
+      const [bq,br]=list[(rnd()*list.length)|0];
+      const [dq,dr]=DIRS[(rnd()*6)|0];
+      const q=bq+dq, r=br+dr;
+      if(Math.abs(q)>R||Math.abs(r)>R||Math.abs(q+r)>R) continue;
+      const key=k(q,r); if(set.has(key)) continue;
+      set.add(key); list.push([q,r]);
+    }
+    return {set,list};
+  }
+
+  // travel until we leave the board; any occupied cell on the way blocks it
+  function pathClear(occ,q,r,d){
+    const [dq,dr]=DIRS[d];
+    let x=q+dq, y=r+dr;
+    while(board.has(k(x,y))){ if(occ.has(k(x,y))) return false; x+=dq; y+=dr; }
+    return true;
+  }
+
+  // built backwards: a tile only goes where its exit is already clear,
+  // so removing in reverse placement order always solves it
+  function generate(n, nrocks, npivots, rnd){
+    const occ=new Set(), out=new Map();
+    for(let i=0;i<npivots;i++){
+      // only on interior cells, and never touching another pivot
+      const opts=cells.filter(([q,r])=>!occ.has(k(q,r))
+        && ringOf(q,r).every(([a,b])=>board.has(k(a,b)))
+        && ringOf(q,r).every(([a,b])=>{ const o=out.get(k(a,b)); return !o || !o.pivot; }));
+      if(!opts.length) break;
+      const [q,r]=opts[(rnd()*opts.length)|0];
+      out.set(k(q,r),{q,r,pivot:true}); occ.add(k(q,r));
+    }
+    for(let i=0;i<nrocks;i++){
+      const [q,r]=cells[(rnd()*cells.length)|0];
+      if(occ.has(k(q,r))) continue;
+      out.set(k(q,r),{q,r,rock:true}); occ.add(k(q,r));
+    }
+    let guard=0, placed=0;
+    while(placed<n && guard++ < n*500){
+      const [q,r]=cells[(rnd()*cells.length)|0];
+      if(occ.has(k(q,r))) continue;
+      const d=(rnd()*6)|0;
+      if(!pathClear(occ,q,r,d)) continue;
+      out.set(k(q,r),{q,r,d,c:(rnd()*8)|0});
+      occ.add(k(q,r)); placed++;
+    }
+    return out;
+  }
+  function movable(){ let n=0; for(const v of tiles.values()) if(!v.rock && !v.pivot) n++; return n; }
+  function snap(){ return {tiles:new Map([...tiles].map(([a,b])=>[a,{...b}])), moves}; }
+
+  function enter(){ if(pendingDaily){ const d=pendingDaily; pendingDaily=null; setupDaily(d); } else startLevel(store.get('escape.level',1)||1); }
+
+  function build(bn, nrocks, npivots, seedKey){
+    const rnd=seeded(seedKey);
+    const g=growBoard(bn,rnd); board=g.set; cells=g.list;
+    tiles=generate(Math.max(4,Math.round(cells.length*0.7)), nrocks, npivots, rnd);
+    par=movable(); budget=par+3; moves=0; assisted=false; armed=null; busy=false; history=[];
+    $('escPar').textContent=par;
+    updateHud(); Stars.sync(); render();
+  }
+  function startLevel(l){
+    mode='level';
+    level=Math.min(l,MAXLEVEL); store.set('escape.level', level);
+    build(boardSizeFor(level), rocksFor(level), pivotsFor(level), 'escape:'+level);
+    $('escLevel').textContent=level+' / '+MAXLEVEL;
+    setHint(baseHint());
+  }
+  function setupDaily(day){
+    mode='daily';
+    build(30, 3, 1, 'daily-escape:'+day);
+    $('escLevel').textContent='Daily';
+    setHint("Today's puzzle — clear the board.");
+  }
+  const baseHint=()=>'Clear path? It flies off. Blocked? It slides up to the blocker and stays.';
+  function setHint(t){ $('escHint').textContent=t; }
+  function updateHud(){ $('escLeft').textContent=movable(); $('escMoves').textContent=moves; }
+
+  /* ---- boosters ---- */
+  function arm(kind,cost){
+    if(armed && armed.kind===kind){ armed=null; setHint(baseHint()); render(); return; }
+    if(Stars.total()<cost){ Sfx.nope(); return; }
+    armed={kind,cost}; Sfx.tap();
+    setHint(kind==='bomb' ? 'Tap a tile to place the bomb 💣 (tap 💣 again to cancel)'
+                          : 'Tap a tile to smash it 🔨 (tap 🔨 again to cancel)');
+    render();
+  }
+  function useBooster(key){
+    const t=tiles.get(key); if(!t) return;
+    if(!Stars.spend(armed.cost)){ Sfx.nope(); armed=null; render(); return; }
+    history.push(snap()); assisted=true;
+    if(armed.kind==='hammer'){ tiles.delete(key); Sfx.slide(); }
+    else {
+      tiles.delete(key);
+      for(const [dq,dr] of DIRS) tiles.delete(k(t.q+dq,t.r+dr));
+      Sfx.boom();
+    }
+    armed=null; buzz(25); setHint(baseHint()); updateHud(); render();
+    if(!movable()) win();
+  }
+
+  function tap(key){
+    if(busy) return;
+    if(armed) return useBooster(key);
+    const t=tiles.get(key); if(!t || t.rock) return;
+    if(t.pivot) return rotate(key);
+    const occ=new Set(tiles.keys()); occ.delete(key);
+    const [dq,dr]=DIRS[t.d];
+    // travel until it leaves the board (escapes) or meets something (stops against it)
+    let x=t.q+dq, y=t.r+dr, lastFree=null, escaped=false;
+    for(;;){
+      if(!board.has(k(x,y))){ escaped=true; break; }
+      if(occ.has(k(x,y))) break;
+      lastFree=[x,y]; x+=dq; y+=dr;
+    }
+    history.push(snap());
+    moves++;
+    const el=$('escboard').querySelector('[data-k="'+key+'"]');
+
+    if(escaped){                       // clear run — off it goes
+      busy=true; Sfx.slide(); buzz(12);
+      if(el){
+        const px=SQ3*(dq+dr/2), py=1.5*dr, mag=Math.hypot(px,py)||1;
+        el.classList.add('fly');
+        el.style.transform='translate(-50%,-50%) translate('+(px/mag*600)+'px,'+(py/mag*600)+'px)';
+      }
+      setTimeout(()=>{
+        tiles.delete(key); busy=false; updateHud(); render();
+        if(!movable()) win(); else afterMove();
+      },300);
+      return;
+    }
+
+    if(lastFree){                      // blocked — slides up against it and stays there
+      busy=true; Sfx.blocked(); buzz(18);
+      const [lx,ly]=lastFree;
+      if(el){
+        const ddx=SQ3*((lx+ly/2)-(t.q+t.r/2)), ddy=1.5*(ly-t.r);
+        el.style.transition='transform .22s ease';
+        el.style.transform='translate(-50%,-50%) translate('+(ddx*lastSize)+'px,'+(ddy*lastSize)+'px)';
+      }
+      setTimeout(()=>{
+        tiles.delete(key);
+        tiles.set(k(lx,ly), Object.assign({}, t, {q:lx, r:ly}));
+        busy=false; updateHud(); render(); afterMove();
+      },230);
+      return;
+    }
+
+    Sfx.blocked(); buzz(30); updateHud();     // nothing in front at all — can't budge
+    if(el){ el.classList.add('shake'); setTimeout(()=>el.classList.remove('shake'),300); }
+    afterMove();
+  }
+
+  // spin the six cells around a pivot one step, arrows turning with them
+  function rotate(key){
+    if(busy) return;
+    const pv=tiles.get(key);
+    const ring=ringOf(pv.q,pv.r);
+    const contents=ring.map(([q,r])=>tiles.get(k(q,r))||null);
+    const el0=$('escboard').querySelector('[data-k="'+key+'"]');
+    moves++;
+    if(contents.some(c=>c && (c.rock||c.pivot))){        // anchored by a rock or another pivot
+      history.push(snap());
+      Sfx.blocked(); buzz(30); updateHud();
+      if(el0){ el0.classList.add('shake'); setTimeout(()=>el0.classList.remove('shake'),300); }
+      setHint('That one is anchored — a rock or another pivot is in its ring.');
+      afterMove(); return;
+    }
+    history.push(snap());
+    busy=true; Sfx.slide(); buzz(18);
+    // slide each occupied neighbour round to the next slot
+    for(let i=0;i<6;i++){
+      if(!contents[i]) continue;
+      const [fq,fr]=ring[i], [tq,tr]=ring[(i+1)%6];
+      const e=$('escboard').querySelector('[data-k="'+k(fq,fr)+'"]');
+      if(e){
+        const ddx=SQ3*((tq+tr/2)-(fq+fr/2)), ddy=1.5*(tr-fr);
+        e.style.transition='transform .25s ease';
+        e.style.transform='translate(-50%,-50%) translate('+(ddx*lastSize)+'px,'+(ddy*lastSize)+'px)';
+      }
+    }
+    setTimeout(()=>{
+      for(let i=0;i<6;i++) if(contents[i]) tiles.delete(k(ring[i][0],ring[i][1]));
+      for(let i=0;i<6;i++){
+        const c=contents[i]; if(!c) continue;
+        const [tq,tr]=ring[(i+1)%6];
+        tiles.set(k(tq,tr), Object.assign({}, c, {q:tq, r:tr, d:(c.d+1)%6}));
+      }
+      busy=false; updateHud(); render(); setHint(baseHint()); afterMove();
+    },260);
+  }
+
+  function anyPlay(){
+    for(const [key,t] of tiles){
+      if(t.rock) continue;
+      if(t.pivot){
+        const c=ringOf(t.q,t.r).map(([a,b])=>tiles.get(k(a,b))||null);
+        if(!c.some(x=>x&&(x.rock||x.pivot)) && c.some(Boolean)) return true;
+        continue;
+      }
+      const occ=new Set(tiles.keys()); occ.delete(key);
+      const [dq,dr]=DIRS[t.d];
+      const x=t.q+dq, y=t.r+dr;
+      if(!board.has(k(x,y))) return true;
+      if(!occ.has(k(x,y))) return true;
+    }
+    return false;
+  }
+  function afterMove(){
+    if(!movable()) return;
+    if(moves>=budget){ setTimeout(outOfMoves,260); return; }
+    if(!anyPlay()) setTimeout(jammed,260);
+  }
+  function jammed(){
+    Sfx.fail();
+    showOverlay({icon:'🧱', title:'Everything is jammed',
+      text:'No hexagon can move. Undo a few taps, or start the level again.',
+      main:'Try again', onMain:()=>startLevel(level)});
+  }
+
+  function starsFor(){ let s = moves<=par ? 3 : (moves<=par+3 ? 2 : 1); if(assisted) s=Math.min(s,2); return s; }
+  function win(){
+    Sfx.done(); buzz([18,40,28]);
+    const earned=starsFor();
+    if(mode==='level'){ Stars.award('escape', level, earned); unlock('escape', level); }
+    setTimeout(()=>{
+      if(mode==='daily'){
+        const st=Daily.complete(earned);
+        showOverlay({icon:'🔥', title:'Daily done!', stars:earned,
+          text:'Cleared in '+moves+' taps. Streak: '+st+' day'+(st===1?'':'s')+'.',
+          main:'Back to menu', onMain:()=>show('menu')});
+        return;
+      }
+      showOverlay({icon:'🎉', title:'Level '+level+' cleared!', stars:earned,
+        text: earned===3 ? 'Perfect — '+moves+' taps, nothing wasted.'
+                         : (assisted ? 'Cleared in '+moves+' taps with a booster.'
+                                     : 'Cleared in '+moves+' taps. Par is '+par+' — no wasted taps for 3 stars.'),
+        main:'Next level', onMain:()=>startLevel(Math.min(level+1,MAXLEVEL))});
+    },320);
+  }
+  function outOfMoves(){
+    Sfx.fail();
+    showOverlay({icon:'😅', title:'Out of moves',
+      text:movable()+' hexagons left. Undo a few, or start over.',
+      main:'Try again', onMain:()=>startLevel(level)});
+  }
+
+  function render(){
+    const wrap=$('escboard');
+    let minx=1e9,miny=1e9,maxx=-1e9,maxy=-1e9;
+    const pos=cells.map(([q,r])=>{ const x=SQ3*(q+r/2), y=1.5*r;
+      if(x<minx)minx=x; if(x>maxx)maxx=x; if(y<miny)miny=y; if(y>maxy)maxy=y; return [q,r,x,y]; });
+    const avail=Math.min((wrap.parentElement.clientWidth||360)-8, 460);
+    const unitsW=(maxx-minx)+SQ3, unitsH=(maxy-miny)+2;
+    const size=Math.min(avail/unitsW, 320/unitsH, 56); lastSize=size;
+    const tw=SQ3*size, th=2*size;
+    wrap.style.width=(unitsW*size)+'px'; wrap.style.height=(unitsH*size)+'px';
+    wrap.innerHTML='';
+    for(const [q,r,x,y] of pos){
+      const key=k(q,r), t=tiles.get(key);
+      const el=document.createElement('div');
+      el.dataset.k=key;
+      el.style.width=tw+'px'; el.style.height=th+'px';
+      el.style.left=((x-minx)+SQ3/2)*size+'px';
+      el.style.top=((y-miny)+1)*size+'px';
+      if(!t){
+        el.className='ehole';
+        const hb=document.createElement('div'); hb.className='base';
+        el.appendChild(hb); el.appendChild(document.createElement('i'));
+        wrap.appendChild(el); continue;
+      }
+      el.className='etile'+(t.rock?' rock':'')+(t.pivot?' pivot':'')+(armed?' armed':'');
+      const base=document.createElement('div'); base.className='base';
+      const i=document.createElement('i');
+      const col = t.rock ? '#4a4660' : (t.pivot ? '#1d1b2b' : 'var('+COLORS[t.c]+')');
+      base.style.setProperty('--tc',col); i.style.setProperty('--tc',col);
+      el.appendChild(base); el.appendChild(i);
+      const a=document.createElement('div'); a.className='arw';
+      if(t.rock){ a.textContent='✕'; a.style.opacity='.55'; }
+      else if(t.pivot){ a.textContent='↻'; a.style.fontSize='26px'; }
+      else{
+        const [dq,dr]=DIRS[t.d];
+        a.textContent='➜';
+        a.style.transform='rotate('+(Math.atan2(1.5*dr, SQ3*(dq+dr/2))*180/Math.PI)+'deg)';
+      }
+      el.appendChild(a);
+      if(!t.rock || armed) el.onclick=()=>tap(key);
+      wrap.appendChild(el);
+    }
+    updateHud();
+  }
+
+  window.addEventListener('resize',()=>{ if(!screens.escape.hidden) render(); });
+  $('escUndo').onclick=()=>{ if(busy) return; const h=history.pop(); if(h){ tiles=h.tiles; moves=h.moves; armed=null; setHint(baseHint()); render(); } };
+  $('escRestart').onclick=()=>startLevel(level);
+  $('escHammer').onclick=()=>arm('hammer',2);
+  $('escBomb').onclick=()=>arm('bomb',3);
+
+  return { enter, start(l){ store.set('escape.level', l); show('escape'); },
+           startDaily(day){ pendingDaily=day; show('escape'); } };
+})();
+
+/* =========================================================
    LEVEL SELECT
    ========================================================= */
+const MODULES={ball:Ball, flow:Flow, escape:Escape};
+const TITLES={ball:'Ball Sort', flow:'Flow', escape:'Hexa Escape'};
 const Levels = (()=>{
   const PER=100;
   let game='ball', page=0;
@@ -873,7 +1285,7 @@ const Levels = (()=>{
     const best=store.get(game+'.best',{});
     const max=maxUnlocked(game);
     const start=page*PER+1, end=Math.min(start+PER-1, MAXLEVEL);
-    $('lvTitle').textContent = game==='ball' ? 'Ball Sort' : 'Flow';
+    $('lvTitle').textContent = TITLES[game];
     $('lvStars').textContent = Stars.total();
     $('lvRange').textContent = start+'–'+end;
     $('lvPrev').disabled = page===0;
@@ -887,7 +1299,7 @@ const Levels = (()=>{
       const sr=document.createElement('div'); sr.className='s';
       sr.innerHTML = locked ? '🔒' : [0,1,2].map(i=>'<span class="'+(i<st?'':'off')+'">★</span>').join('');
       b.appendChild(num); b.appendChild(sr);
-      if(!locked) b.onclick=()=>{ Sfx.tap(); (game==='ball'?Ball:Flow).start(l); };
+      if(!locked) b.onclick=()=>{ Sfx.tap(); MODULES[game].start(l); };
       g.appendChild(b);
     }
   }
@@ -904,7 +1316,8 @@ const Daily = (()=>{
   const day = d => d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
   const today = ()=>day(new Date());
   const yesterday = ()=>day(new Date(Date.now()-86400000));
-  const gameFor = d => (hash32('pick:'+d)%2===0) ? 'ball' : 'flow';
+  const ORDER=['ball','flow','escape'];
+  const gameFor = d => ORDER[hash32('pick:'+d)%3];
   const doneToday = ()=> store.get('daily.done','')===today();
   function streak(){
     const last=store.get('daily.done','');
@@ -923,17 +1336,30 @@ const Daily = (()=>{
   }
   function open(){
     const t=today();
-    (gameFor(t)==='ball' ? Ball : Flow).startDaily(t);
+    MODULES[gameFor(t)].startDaily(t);
   }
   function syncCard(){
     const sub=$('dailySub'); if(!sub) return;
-    const st=streak(), name = gameFor(today())==='ball' ? 'Ball Sort' : 'Flow';
+    const st=streak(), name = TITLES[gameFor(today())];
     const strk = st>0 ? ' · 🔥 '+st+' day'+(st===1?'':'s') : '';
     sub.textContent = doneToday() ? ('Done today ✓'+strk) : ('Today: '+name+strk);
   }
   return { open, complete, streak, doneToday, syncCard };
 })();
 $('dailyCard').onclick=()=>{ Sfx.tap(); Daily.open(); };
+
+/* ---------- theme ---------- */
+function applyTheme(t){
+  document.documentElement.setAttribute('data-theme', t);
+  const b=$('themeBtn'); if(b) b.textContent = t==='light' ? '☀️' : '🌙';
+  const m=document.querySelector('meta[name="theme-color"]');
+  if(m) m.setAttribute('content', t==='light' ? '#eceaf6' : '#14131b');
+}
+applyTheme(store.get('theme','dark'));
+$('themeBtn').onclick=()=>{
+  const t = store.get('theme','dark')==='dark' ? 'light' : 'dark';
+  store.set('theme',t); applyTheme(t); Sfx.tap();
+};
 
 /* ---------- sound buttons ---------- */
 document.querySelectorAll('[data-sfx]').forEach(b=>{

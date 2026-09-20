@@ -1,0 +1,15 @@
+{
+  "name": "Puzzle Corner",
+  "short_name": "Puzzle Corner",
+  "description": "Ball Sort, Flow, and Hexa Escape — three calm puzzles, no ads, works offline.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#14131b",
+  "theme_color": "#14131b",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}

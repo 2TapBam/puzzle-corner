@@ -134,51 +134,111 @@
   .cell .lk.r{top:35%;height:30%;left:50%;width:50%;}
   .cell.done .dot{box-shadow:inset -3px -4px 0 rgba(0,0,0,.2), inset 3px 3px 0 rgba(255,255,255,.28), 0 0 0 3px rgba(255,255,255,.55);}
 
-  /* ---- hexa escape ---- */
-  #escWrap{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+  /* ---- hexa escape (flat-top hex grid) ---- */
+  #escWrap{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;}
   .escboard{position:relative;margin:auto;}
+
+  .ehud{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px;}
+  .ehud-side{display:flex;gap:8px;}
+  .escbtn{
+    width:44px;height:44px;border:none;border-radius:14px;flex:none;
+    background:linear-gradient(180deg,#5369be,#4053a5);color:#fff;font-size:18px;
+    display:inline-flex;align-items:center;justify-content:center;
+    box-shadow:0 3px 0 #2c3872,0 5px 10px rgba(0,0,0,.25);
+  }
+  .escbtn:active{transform:translateY(2px);box-shadow:0 1px 0 #2c3872;}
+  .escbtn.ghost{background:var(--surface);color:var(--text);box-shadow:none;border:1px solid var(--line);}
+  .ehud-center{text-align:center;padding-top:1px;}
+  .elevel{
+    display:inline-block;padding:6px 16px;border-radius:10px;
+    background:linear-gradient(180deg,#5369be,#4053a5);color:#fff;
+    font-weight:700;font-size:12px;letter-spacing:1.2px;text-transform:uppercase;
+    box-shadow:0 2px 0 rgba(0,0,0,.18);
+  }
+  .emoves{
+    margin-top:5px;padding:5px 16px 6px;font-weight:700;font-size:14px;color:var(--text);
+    background:var(--surface);border:2px solid #4053a5;
+    clip-path:polygon(10% 0,90% 0,100% 50%,90% 100%,10% 100%,0 50%);
+  }
+  .etarget{display:flex;align-items:center;gap:10px;margin-bottom:6px;}
+  .etarget-text{
+    flex:1;font-weight:600;font-size:14px;background:var(--surface);
+    border:1px solid var(--line);padding:10px 14px;border-radius:14px;
+  }
+
+  .eground,.ehole{position:absolute;transform:translate(-50%,-50%);}
+  .eground .base,.eground i,.ehole .base,.ehole i{
+    position:absolute;inset:0;display:block;
+    clip-path:polygon(25% 3%,75% 3%,99% 50%,75% 97%,25% 97%,1% 50%);
+  }
+  .eground .base{background:var(--cell);filter:brightness(.82);transform:translateY(8%);}
+  .eground i{background:var(--cell);}
+  .ehole{pointer-events:none;}
+  .ehole .base{background:#0a0912;filter:brightness(.6);transform:translateY(6%);}
+  .ehole i{background:#0a0912;box-shadow:inset 0 6px 10px rgba(0,0,0,.6);}
+  .eground.armed i{box-shadow:0 0 0 2px var(--accent) inset;}
+
   .etile{position:absolute;transform:translate(-50%,-50%);cursor:pointer;}
   .etile .base{
     position:absolute;inset:0;display:block;background:var(--tc,#666);
-    clip-path:polygon(50% 1%,100% 25%,100% 75%,50% 99%,0 75%,0 25%);
-    transform:translateY(10%);filter:brightness(.55);
+    clip-path:polygon(25% 3%,75% 3%,99% 50%,75% 97%,25% 97%,1% 50%);
+    transform:translateY(9%);filter:brightness(.6);
   }
   .etile i{
     position:absolute;inset:0;display:block;background:var(--tc,#666);
-    clip-path:polygon(50% 1%,100% 25%,100% 75%,50% 99%,0 75%,0 25%);
-    box-shadow:inset -3px -4px 0 rgba(0,0,0,.18), inset 4px 5px 0 rgba(255,255,255,.3);
+    clip-path:polygon(25% 3%,75% 3%,99% 50%,75% 97%,25% 97%,1% 50%);
+    box-shadow:inset -3px -5px 0 rgba(0,0,0,.16),inset 3px 4px 0 rgba(255,255,255,.3);
   }
-  @keyframes armpulse{0%,100%{filter:brightness(1)}50%{filter:brightness(1.35)}}
+  .etile:active{filter:brightness(1.14);}
+  .etile.wall{cursor:default;}
+  .etile.wall .base,.etile.wall i{background:#4a4660;}
+  .etile.brk .base,.etile.brk i{background:#a9713f;}
+  .etile.locked .base,.etile.locked i{background:#232030;}
+  .etile.pivot .base{filter:brightness(.7);}
+  .etile.pivot i{background:#e9e7f5;box-shadow:none;}
+  @keyframes armpulse{0%,100%{filter:brightness(1)}50%{filter:brightness(1.4)}}
   .etile.armed{animation:armpulse .9s ease-in-out infinite;}
+
   .etile .arw{
     position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-    font-size:20px;color:#fff;font-weight:700;z-index:2;pointer-events:none;
-    text-shadow:0 1px 3px rgba(0,0,0,.4);
+    z-index:3;pointer-events:none;
   }
-  .etile:active{filter:brightness(1.15);}
-  .etile.rock{cursor:default;}
-  .etile.pivot .base{filter:brightness(.78);}
-  .etile.pivot i{box-shadow:none;}
-  .etile .tok{
-    position:absolute;inset:19%;border-radius:50%;background:#16141f;z-index:3;
-    display:flex;align-items:center;justify-content:center;
-    color:#fff;font-size:21px;font-weight:700;pointer-events:none;
-    box-shadow:0 0 0 3px #fff, 0 3px 7px rgba(0,0,0,.45);
+  .etile .arw .ah{
+    width:46%;height:46%;background:#fff;
+    clip-path:polygon(50% 0%,100% 42%,70% 42%,70% 100%,30% 100%,30% 42%,0% 42%);
+    filter:drop-shadow(0 1px 2px rgba(0,0,0,.35));
   }
-  .etile.rock:active{filter:none;}
-  .ehole{position:absolute;transform:translate(-50%,-50%);pointer-events:none;}
-  .ehole .base{
-    position:absolute;inset:0;display:block;background:var(--cell);
-    clip-path:polygon(50% 1%,100% 25%,100% 75%,50% 99%,0 75%,0 25%);
-    transform:translateY(9%);filter:brightness(.78);
+  .etile .arw .ic{color:#fff;font-size:19px;opacity:.65;text-shadow:0 1px 2px rgba(0,0,0,.4);}
+  .etile .cnt,.etile .tok{
+    position:absolute;inset:24%;border-radius:50%;background:#16141f;z-index:3;
+    display:flex;align-items:center;justify-content:center;color:#fff;font-size:19px;font-weight:700;
+    box-shadow:0 0 0 3px #fff,0 3px 7px rgba(0,0,0,.45);pointer-events:none;
   }
-  .ehole i{
-    position:absolute;inset:0;display:block;background:var(--cell);
-    clip-path:polygon(50% 1%,100% 25%,100% 75%,50% 99%,0 75%,0 25%);
-  }
+
   @keyframes eshake{0%,100%{transform:translate(-50%,-50%)}25%{transform:translate(-58%,-50%)}75%{transform:translate(-42%,-50%)}}
-  .etile.shake{animation:eshake .26s ease;}
-  .etile.fly{transition:transform .32s cubic-bezier(.4,0,.9,.4), opacity .32s ease;opacity:0;}
+  .etile.shake,.eground.shake{animation:eshake .26s ease;}
+  .etile.fly{transition:transform .32s cubic-bezier(.4,0,.9,.4),opacity .32s ease;opacity:0;}
+
+  .ehand{position:absolute;transform:translate(-50%,-70%);font-size:32px;pointer-events:none;z-index:5;
+    animation:handbob 1s ease-in-out infinite;filter:drop-shadow(0 4px 6px rgba(0,0,0,.45));}
+  @keyframes handbob{0%,100%{transform:translate(-50%,-70%) scale(1)}50%{transform:translate(-50%,-42%) scale(.9)}}
+
+  .eboosters{display:flex;gap:12px;justify-content:center;padding:8px 0 2px;}
+  .boosterbtn{
+    position:relative;width:54px;height:54px;border:none;border-radius:16px;flex:none;
+    background:linear-gradient(180deg,#5fd3e8,#2fb3cc);font-size:23px;
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 4px 0 #1c8599,0 6px 12px rgba(0,0,0,.25);
+  }
+  .boosterbtn:active{transform:translateY(3px);box-shadow:0 1px 0 #1c8599;}
+  .boosterbtn.armed{outline:3px solid var(--accent);outline-offset:2px;}
+  .boosterbtn:disabled{opacity:.4;filter:grayscale(.4);}
+  .boosterbtn .badge{
+    position:absolute;bottom:-6px;right:-6px;min-width:20px;height:20px;padding:0 4px;
+    border-radius:10px;background:#8347e6;color:#fff;font-size:11px;font-weight:700;
+    display:flex;align-items:center;justify-content:center;box-shadow:0 2px 4px rgba(0,0,0,.35);
+  }
+  .estars{margin:6px auto 0;width:max-content;}
 
   /* ---- level select ---- */
   .lvgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;overflow-y:auto;padding-bottom:16px;align-content:start;flex:1;}
@@ -303,28 +363,34 @@
 
   <!-- ===== HEXA ESCAPE ===== -->
   <section id="escape" class="stage" hidden>
-    <div class="bar">
-      <button class="iconbtn" data-home>‹ Menu</button>
-      <div class="spacer"></div>
-      <div class="pill"><small>Left</small> <span id="escLeft">0</span></div>
-      <div class="pill"><small>Moves</small> <span id="escMoves">0</span><small>/ par</small> <span id="escPar">0</span></div>
+    <div class="ehud" id="escHud">
+      <div class="ehud-side">
+        <button class="escbtn" data-home title="Home">🏠</button>
+        <button class="escbtn" id="escRestart" title="Restart">↻</button>
+      </div>
+      <div class="ehud-center">
+        <div class="elevel" id="escLevelBadge">LEVEL 1</div>
+        <div class="emoves">Moves: <span id="escMoves">0</span></div>
+      </div>
+      <div class="ehud-side">
+        <button class="escbtn ghost" id="escUndo" title="Undo">↶</button>
+        <button class="escbtn ghost" data-sfx title="Sound">🔊</button>
+        <button class="escbtn ghost" data-levels="escape" title="Levels">☰</button>
+      </div>
     </div>
-    <div class="bar" style="margin-bottom:4px;">
-      <button class="iconbtn" id="escUndo">↶</button>
-      <button class="iconbtn" id="escRestart">↻</button>
-      <button class="iconbtn" data-levels="escape">☰</button>
-      <button class="iconbtn" data-sfx>🔊</button>
-      <div class="spacer"></div>
-      <div class="pill"><small>Level</small> <span id="escLevel">1</span></div>
+    <div class="etarget" id="escTarget" hidden>
+      <button class="escbtn" id="escBack" title="Back">‹</button>
+      <div class="etarget-text" id="escTargetText">Tap a tile</div>
     </div>
-    <div class="bar" style="margin-bottom:4px;">
-      <button class="iconbtn" id="escHammer">🔨<small style="color:var(--accent)">2★</small></button>
-      <button class="iconbtn" id="escBomb">💣<small style="color:var(--accent)">3★</small></button>
-      <div class="spacer"></div>
-      <div class="pill gold">★ <span id="escStars">0</span></div>
-    </div>
-    <div class="hint" id="escHint">Clear path? It flies off. Blocked? It slides up to the blocker and stays.</div>
+    <div class="hint" id="escHint">Tap a hex — it flies off the way its arrow points.</div>
     <div id="escWrap"><div class="escboard" id="escboard"></div></div>
+    <div class="eboosters">
+      <button class="boosterbtn" id="escMoveBoost" title="Extra move"><span>➕</span><span class="badge">1★</span></button>
+      <button class="boosterbtn" id="escDrill" title="Drill a hole"><span>🛠️</span><span class="badge">2★</span></button>
+      <button class="boosterbtn" id="escHammer" title="Hammer"><span>🔨</span><span class="badge">2★</span></button>
+      <button class="boosterbtn" id="escBomb" title="Bomb"><span>💣</span><span class="badge">3★</span></button>
+    </div>
+    <div class="pill gold estars">★ <span id="escStars">0</span></div>
   </section>
 
   <!-- ===== LEVEL SELECT ===== -->
@@ -352,6 +418,7 @@
     <div class="starrow" id="ovStars" hidden></div>
     <p id="ovText"></p>
     <button class="btn" id="ovMain">Continue</button>
+    <button class="btn ghost" id="ovExtra" hidden></button>
     <button class="btn ghost" id="ovMenu">Back to menu</button>
   </div>
 </div>
@@ -412,6 +479,9 @@ const Sfx = (()=>{
     blocked(){ tone(150,.13,'square',.06); },
     boom(){ tone(140,.3,'sawtooth',.11); tone(80,.36,'sine',.09,.05); },
     nope(){ tone(180,.16,'sawtooth',.06); },
+    fail(){ tone(220,.14,'sawtooth',.07); tone(160,.16,'sawtooth',.06,.05); },
+    unlock(){ tone(700,.08,'triangle',.08); tone(980,.1,'triangle',.07,.06); },
+    drill(){ tone(200,.05,'sawtooth',.05); tone(240,.05,'sawtooth',.05,.05); tone(180,.05,'sawtooth',.05,.10); },
     done(){ [523,659,784,1047].forEach((f,i)=>tone(f,.22,'sine',.09,i*.09)); }
   };
 })();
@@ -441,7 +511,9 @@ const Stars = (()=>{
       if(bt) bt.disabled = t<3;
       if(bh) bh.disabled = t<2;
       if(fh) fh.disabled = t<2;
-      const eh=$('escHammer'), eb=$('escBomb');
+      const emv=$('escMoveBoost'), edr=$('escDrill'), eh=$('escHammer'), eb=$('escBomb');
+      if(emv) emv.disabled = t<1;
+      if(edr) edr.disabled = t<2;
       if(eh) eh.disabled = t<2;
       if(eb) eb.disabled = t<3;
     }
@@ -466,7 +538,7 @@ document.querySelectorAll('[data-levels]').forEach(b=> b.onclick=()=>Levels.open
 /* ---------- overlay ---------- */
 const overlay=$('overlay');
 let ovAction=null;
-function showOverlay({icon,title,text,main,onMain,stars}){
+function showOverlay({icon,title,text,main,onMain,stars,extra}){
   $('ovIcon').textContent=icon; $('ovTitle').textContent=title;
   $('ovText').textContent=text||''; $('ovMain').textContent=main||'Continue';
   const sr=$('ovStars');
@@ -474,6 +546,9 @@ function showOverlay({icon,title,text,main,onMain,stars}){
     sr.hidden=false;
     sr.innerHTML=[0,1,2].map(i=>'<span class="'+(i<stars?'':'off')+'">★</span>').join('');
   } else sr.hidden=true;
+  const ex=$('ovExtra');
+  if(extra){ ex.hidden=false; ex.textContent=extra.text; ex.onclick=()=>{ hideOverlay(); extra.onClick(); }; }
+  else ex.hidden=true;
   ovAction=onMain; overlay.classList.add('show');
 }
 function hideOverlay(){ overlay.classList.remove('show'); }
@@ -951,26 +1026,55 @@ const Flow = (()=>{
    HEXA ESCAPE — tap a tile to fly it out, if its path is clear
    ========================================================= */
 const Escape = (()=>{
-  const DIRS=[[1,0],[1,-1],[0,-1],[-1,0],[-1,1],[0,1]];   // pointy-top axial
+  /* ---------------------------------------------------------------------
+     Real flat-top hex grid, axial coordinates (q,r).
+     Six neighbours — no pure E/W, matching a flat-top layout:
+       N=(0,-1)  NE=(1,-1)  SE=(1,0)  S=(0,1)  SW=(-1,1)  NW=(-1,0)
+     Screen projection (size = hex circumradius):
+       x = 1.5*size*q
+       y = SQ3*size*(r + q/2)
+     deg = clockwise CSS rotation to point an "up"-drawn arrow that way.
+     --------------------------------------------------------------------- */
+  const DIRS=[
+    {name:'N', dq:0, dr:-1, deg:0},
+    {name:'NE',dq:1, dr:-1, deg:60},
+    {name:'SE',dq:1, dr:0,  deg:120},
+    {name:'S', dq:0, dr:1,  deg:180},
+    {name:'SW',dq:-1,dr:1,  deg:240},
+    {name:'NW',dq:-1,dr:0,  deg:300},
+  ];
   const SQ3=Math.sqrt(3);
   const k=(q,r)=>q+','+r;
-  let board=new Set(), cells=[], tiles=new Map();
-  let level=1, moves=0, par=0, budget=0, busy=false, history=[], assisted=false, armed=null;
+  const ringOf=(q,r)=>DIRS.map(({dq,dr})=>[q+dq,r+dr]);
+  const dirVec=d=>{ const {dq,dr}=DIRS[d]; return [1.5*dq, SQ3*(dr+dq/2)]; };
+  const cellDelta=(q2,r2,q1,r1)=>[1.5*(q2-q1), SQ3*((r2+q2/2)-(r1+q1/2))];
+
+  // ground = traversable hex cells. holeSet = cells drawn as a pit (void within the board).
+  // cells outside `ground` and not in `holeSet` are plain void — nothing is drawn there.
+  let ground=new Set(), holeSet=new Set(), cells=[], tiles=new Map();
+  let level=1, moves=0, par=0, budget=0, busy=false, history=[], assisted=false;
   let mode='level', pendingDaily=null, lastSize=40;
+  let gmode='NORMAL';         // NORMAL | hammer | bomb | drill  (booster targeting state)
+  let tutActive=false;
 
-  function boardSizeFor(l){ return Math.min(12 + Math.floor((l-1)/6), 54); }
-  function rocksFor(l){ return Math.min(Math.floor(l/15), 6); }
-  function pivotsFor(l){ return l<25 ? 0 : (l<120 ? 1 : 2); }
-  const ringOf=(q,r)=>DIRS.map(([dq,dr])=>[q+dq,r+dr]);
-  function maxRad(n){ return n<=19 ? 2 : (n<=37 ? 3 : 4); }
+  const BOOST_COST={move:1, drill:2, hammer:2, bomb:3};
+  const EXTRA_MOVES=5, EXTRA_MOVES_COST=2;
 
-  // grow an irregular connected blob of cells — corridors, holes, odd shapes
+  function boardSizeFor(l){ return Math.min(9 + Math.floor((l-1)/5), 55); }
+  function wallsFor(l){ return l<8 ? 0 : Math.min(1+((l-8)/10|0), 5); }
+  function brkFor(l){ return l<15 ? 0 : Math.min(1+((l-15)/12|0), 4); }
+  function lockedFor(l){ return l<28 ? 0 : Math.min(1+((l-28)/20|0), 3); }
+  function pivotsFor(l){ return l<18 ? 0 : (l<90 ? 1 : 2); }
+  function holesFor(l){ return l<12 ? 0 : Math.min(1+((l-12)/16|0), 3); }
+  function maxRad(n){ return n<=19 ? 2 : (n<=37 ? 3 : (n<=54 ? 4 : 5)); }
+
+  // grow an irregular connected blob of cells — corridors, islands, odd shapes
   function growBoard(n, rnd){
     const R=maxRad(n), set=new Set([k(0,0)]), list=[[0,0]];
     let guard=0;
     while(list.length<n && guard++ < n*200){
       const [bq,br]=list[(rnd()*list.length)|0];
-      const [dq,dr]=DIRS[(rnd()*6)|0];
+      const {dq,dr}=DIRS[(rnd()*6)|0];
       const q=bq+dq, r=br+dr;
       if(Math.abs(q)>R||Math.abs(r)>R||Math.abs(q+r)>R) continue;
       const key=k(q,r); if(set.has(key)) continue;
@@ -978,148 +1082,269 @@ const Escape = (()=>{
     }
     return {set,list};
   }
+  // carve a few fully-interior cells into visible holes (void a piece can fall through)
+  function carveHoles(set, list, n, rnd){
+    const holes=new Set(); let tries=0;
+    while(holes.size<n && tries++ < 400){
+      const [q,r]=list[(rnd()*list.length)|0], key=k(q,r);
+      if(holes.has(key)) continue;
+      if(!ringOf(q,r).every(([a,b])=>set.has(k(a,b)))) continue;   // only fully-surrounded cells
+      holes.add(key);
+    }
+    for(const hk of holes) set.delete(hk);
+    return holes;
+  }
 
-  // travel until we leave the board; any occupied cell on the way blocks it
+  // travel until we leave the ground; any occupied cell on the way blocks it
   function pathClear(occ,q,r,d){
-    const [dq,dr]=DIRS[d];
+    const {dq,dr}=DIRS[d];
     let x=q+dq, y=r+dr;
-    while(board.has(k(x,y))){ if(occ.has(k(x,y))) return false; x+=dq; y+=dr; }
+    while(ground.has(k(x,y))){ if(occ.has(k(x,y))) return false; x+=dq; y+=dr; }
     return true;
   }
 
-  // built backwards: a tile only goes where its exit is already clear,
-  // so removing in reverse placement order always solves it
-  function generate(n, nrocks, npivots, rnd){
+  // built backwards: a tile only goes where its exit is already clear at placement time,
+  // so removing pieces in reverse placement order is always a valid, guaranteed solution
+  function generate(n, nWalls, nBrk, nLocked, nPivots, rnd){
     const occ=new Set(), out=new Map();
-    for(let i=0;i<npivots;i++){
-      // only on interior cells, and never touching another pivot
-      const opts=cells.filter(([q,r])=>!occ.has(k(q,r))
-        && ringOf(q,r).every(([a,b])=>board.has(k(a,b)))
-        && ringOf(q,r).every(([a,b])=>{ const o=out.get(k(a,b)); return !o || !o.pivot; }));
+    const emptyCells=()=>cells.filter(([q,r])=>ground.has(k(q,r)) && !occ.has(k(q,r)));
+
+    for(let i=0;i<nPivots;i++){
+      const opts=emptyCells().filter(([q,r])=>ringOf(q,r).every(([a,b])=>ground.has(k(a,b)))
+        && ringOf(q,r).every(([a,b])=>{ const o=out.get(k(a,b)); return !o || o.type!=='pivot'; }));
       if(!opts.length) break;
       const [q,r]=opts[(rnd()*opts.length)|0];
-      out.set(k(q,r),{q,r,pivot:true}); occ.add(k(q,r));
+      out.set(k(q,r),{type:'pivot',q,r}); occ.add(k(q,r));
     }
-    for(let i=0;i<nrocks;i++){
-      const [q,r]=cells[(rnd()*cells.length)|0];
-      if(occ.has(k(q,r))) continue;
-      out.set(k(q,r),{q,r,rock:true}); occ.add(k(q,r));
+    for(let i=0;i<nWalls;i++){
+      const opts=emptyCells(); if(!opts.length) break;
+      const [q,r]=opts[(rnd()*opts.length)|0];
+      out.set(k(q,r),{type:'wall',q,r}); occ.add(k(q,r));
     }
+    for(let i=0;i<nBrk;i++){
+      const opts=emptyCells(); if(!opts.length) break;
+      const [q,r]=opts[(rnd()*opts.length)|0];
+      out.set(k(q,r),{type:'brk',q,r}); occ.add(k(q,r));
+    }
+
+    const order=[];
     let guard=0, placed=0;
-    while(placed<n && guard++ < n*500){
-      const [q,r]=cells[(rnd()*cells.length)|0];
-      if(occ.has(k(q,r))) continue;
+    while(placed<n && guard++ < n*600){
+      const opts=emptyCells(); if(!opts.length) break;
+      const [q,r]=opts[(rnd()*opts.length)|0];
       const d=(rnd()*6)|0;
       if(!pathClear(occ,q,r,d)) continue;
-      out.set(k(q,r),{q,r,d,c:(rnd()*8)|0});
-      occ.add(k(q,r)); placed++;
+      const key=k(q,r);
+      out.set(key,{type:'normal',q,r,d,c:(rnd()*8)|0});
+      occ.add(key); order.push(key); placed++;
+    }
+
+    // retrofit a few placed pieces into locked/countdown pieces — only where enough
+    // moves will have already happened (in the guaranteed reverse-order solve) to unlock them
+    const N=order.length; let toLock=nLocked;
+    for(let i=0;i<N && toLock>0;i++){
+      const headroom=N-1-i;
+      if(headroom<1) continue;
+      if(rnd()<0.35){
+        const t=out.get(order[i]);
+        t.type='locked'; t.cnt=1+((rnd()*Math.min(3,headroom))|0);
+        toLock--;
+      }
     }
     return out;
   }
-  function movable(){ let n=0; for(const v of tiles.values()) if(!v.rock && !v.pivot) n++; return n; }
+
+  function requiredCount(){ let n=0; for(const t of tiles.values()) if(t.type==='normal'||t.type==='locked') n++; return n; }
   function snap(){ return {tiles:new Map([...tiles].map(([a,b])=>[a,{...b}])), moves}; }
 
   function enter(){ if(pendingDaily){ const d=pendingDaily; pendingDaily=null; setupDaily(d); } else startLevel(store.get('escape.level',1)||1); }
 
-  function build(bn, nrocks, npivots, seedKey){
+  function build(bn, opts, seedKey){
     const rnd=seeded(seedKey);
-    const g=growBoard(bn,rnd); board=g.set; cells=g.list;
-    tiles=generate(Math.max(4,Math.round(cells.length*0.7)), nrocks, npivots, rnd);
-    par=movable(); budget=par+3; moves=0; assisted=false; armed=null; busy=false; history=[];
-    $('escPar').textContent=par;
-    updateHud(); Stars.sync(); render();
+    const g=growBoard(bn,rnd);
+    const holes=carveHoles(g.set, g.list, opts.holes, rnd);
+    ground=g.set; cells=g.list; holeSet=holes;
+    // keep a few cells empty no matter how many obstacles a level asks for — bomb/drill need
+    // an empty target, and a fully-packed board reads as cluttered rather than puzzly
+    const reserve=Math.max(2, Math.round(cells.length*0.1));
+    const obstacleBudget=opts.walls+opts.brk+opts.pivots;
+    const n=Math.max(4, Math.min(Math.round(cells.length*0.62), cells.length-obstacleBudget-reserve));
+    tiles=generate(n, opts.walls, opts.brk, opts.locked, opts.pivots, rnd);
+    par=requiredCount(); budget=par+3; moves=0; assisted=false; gmode='NORMAL'; busy=false; history=[];
+    syncTargetUI(); updateHud(); Stars.sync(); render();
   }
   function startLevel(l){
     mode='level';
     level=Math.min(l,MAXLEVEL); store.set('escape.level', level);
-    build(boardSizeFor(level), rocksFor(level), pivotsFor(level), 'escape:'+level);
-    $('escLevel').textContent=level+' / '+MAXLEVEL;
+    tutActive = level===1 && !store.get('escape.tut.done',false);
+    if(level===1) buildTutorial();
+    else build(boardSizeFor(level), {
+      walls:wallsFor(level), brk:brkFor(level), locked:lockedFor(level),
+      pivots:pivotsFor(level), holes:holesFor(level)
+    }, 'escape:'+level);
+    $('escLevelBadge').textContent='LEVEL '+level;
     setHint(baseHint());
+    render();
+  }
+  // a hand-built, obvious first level: four pieces, no obstacles, teaches tap-to-escape
+  function buildTutorial(){
+    ground=new Set(); cells=[]; holeSet=new Set();
+    for(const [q,r] of [[0,0],[1,0],[1,-1],[0,-1],[-1,0],[-1,1],[0,1]]){
+      ground.add(k(q,r)); cells.push([q,r]);
+    }
+    tiles=new Map();
+    tiles.set(k(0,-1), {type:'normal',q:0,r:-1,d:0,c:0});   // N  — escapes immediately
+    tiles.set(k(1,0),  {type:'normal',q:1, r:0, d:2,c:3});  // SE — escapes immediately
+    tiles.set(k(-1,1), {type:'normal',q:-1,r:1, d:4,c:2});  // SW — escapes immediately
+    tiles.set(k(0,0),  {type:'normal',q:0, r:0, d:3,c:1});  // S  — travels through one cell, then off
+    par=4; budget=6; moves=0; assisted=false; gmode='NORMAL'; busy=false; history=[];
+    syncTargetUI(); updateHud(); Stars.sync();
   }
   function setupDaily(day){
     mode='daily';
-    build(30, 3, 1, 'daily-escape:'+day);
-    $('escLevel').textContent='Daily';
+    build(28, {walls:2, brk:1, locked:1, pivots:1, holes:1}, 'daily-escape:'+day);
+    $('escLevelBadge').textContent='DAILY';
     setHint("Today's puzzle — clear the board.");
   }
-  const baseHint=()=>'Clear path? It flies off. Blocked? It slides up to the blocker and stays.';
+  const baseHint=()=>'Tap a hex — it flies off the way its arrow points, or slides up to whatever blocks it.';
   function setHint(t){ $('escHint').textContent=t; }
-  function updateHud(){ $('escLeft').textContent=movable(); $('escMoves').textContent=moves; }
+  function updateHud(){ $('escMoves').textContent=Math.max(budget-moves,0); }
+  function shakeEl(key){
+    const el=$('escboard').querySelector('[data-k="'+key+'"]');
+    if(el){ el.classList.add('shake'); setTimeout(()=>el.classList.remove('shake'),300); }
+  }
 
-  /* ---- boosters ---- */
-  function arm(kind,cost){
-    if(armed && armed.kind===kind){ armed=null; setHint(baseHint()); render(); return; }
-    if(Stars.total()<cost){ Sfx.nope(); return; }
-    armed={kind,cost}; Sfx.tap();
-    setHint(kind==='bomb' ? 'Tap a tile to place the bomb 💣 (tap 💣 again to cancel)'
-                          : 'Tap a tile to smash it 🔨 (tap 🔨 again to cancel)');
-    render();
+  /* ---- countdown / locked pieces: tick on every committed player move ---- */
+  function tickLocks(){
+    for(const t of tiles.values()){
+      if(t.type==='locked'){
+        t.cnt--;
+        if(t.cnt<=0){ t.type='normal'; delete t.cnt; Sfx.unlock(); }
+      }
+    }
+  }
+
+  /* ---- boosters: explicit targeting state, never mixed with normal movement ---- */
+  function arm(kind){
+    if(busy) return;
+    if(gmode===kind){ gmode='NORMAL'; syncTargetUI(); render(); return; }
+    if(kind==='move'){
+      if(!Stars.spend(BOOST_COST.move)){ Sfx.nope(); return; }
+      budget++; assisted=true; Sfx.tap(); buzz(10); updateHud(); render();
+      return;
+    }
+    if(Stars.total()<BOOST_COST[kind]){ Sfx.nope(); return; }
+    gmode=kind; Sfx.tap(); syncTargetUI(); render();
+  }
+  function syncTargetUI(){
+    const hud=$('escHud'), tgt=$('escTarget'), txt=$('escTargetText');
+    document.querySelectorAll('.boosterbtn').forEach(b=>b.classList.remove('armed'));
+    if(gmode==='NORMAL'){ hud.hidden=false; tgt.hidden=true; return; }
+    hud.hidden=true; tgt.hidden=false;
+    const MAP={ hammer:['🔨 Tap a tile to smash it','escHammer'],
+                bomb:['💣 Tap a tile to place the bomb','escBomb'],
+                drill:['🛠️ Tap an empty tile to drill a hole','escDrill'] };
+    const [label,btnId]=MAP[gmode];
+    txt.textContent=label;
+    const b=$(btnId); if(b) b.classList.add('armed');
+  }
+  function eligibleTarget(t){
+    if(gmode==='hammer') return !!t && t.type!=='wall';
+    if(gmode==='bomb' || gmode==='drill') return !t;
+    return false;
   }
   function useBooster(key){
-    const t=tiles.get(key); if(!t) return;
-    if(!Stars.spend(armed.cost)){ Sfx.nope(); armed=null; render(); return; }
-    history.push(snap()); assisted=true;
-    if(armed.kind==='hammer'){ tiles.delete(key); Sfx.slide(); }
-    else {
-      tiles.delete(key);
-      for(const [dq,dr] of DIRS) tiles.delete(k(t.q+dq,t.r+dr));
-      Sfx.boom();
+    const t=tiles.get(key);
+    if(!eligibleTarget(t)){ Sfx.nope(); shakeEl(key); return; }
+
+    if(gmode==='hammer'){
+      if(!Stars.spend(BOOST_COST.hammer)){ Sfx.nope(); gmode='NORMAL'; syncTargetUI(); render(); return; }
+      history.push(snap()); assisted=true;
+      tiles.delete(key); Sfx.slide(); buzz(25);
+    } else if(gmode==='bomb'){
+      if(!Stars.spend(BOOST_COST.bomb)){ Sfx.nope(); gmode='NORMAL'; syncTargetUI(); render(); return; }
+      history.push(snap()); assisted=true;
+      const [cq,cr]=key.split(',').map(Number);
+      for(const {dq,dr} of DIRS){
+        const nk=k(cq+dq,cr+dr), o=tiles.get(nk);
+        if(o && o.type!=='wall') tiles.delete(nk);
+      }
+      Sfx.boom(); buzz(40);
+    } else if(gmode==='drill'){
+      if(!Stars.spend(BOOST_COST.drill)){ Sfx.nope(); gmode='NORMAL'; syncTargetUI(); render(); return; }
+      history.push(snap()); assisted=true;
+      ground.delete(key); holeSet.add(key);
+      Sfx.drill(); buzz(20);
     }
-    armed=null; buzz(25); setHint(baseHint()); updateHud(); render();
-    if(!movable()) win();
+    gmode='NORMAL'; syncTargetUI(); updateHud(); render();
+    if(requiredCount()===0) win();
   }
 
+  /* ---- the movement resolver: tap a piece, walk its arrow direction until
+     it leaves the board / falls into a hole / is stopped by something solid ---- */
   function tap(key){
     if(busy) return;
-    if(armed) return useBooster(key);
-    const t=tiles.get(key); if(!t || t.rock) return;
-    if(t.pivot) return rotate(key);
+    if(gmode!=='NORMAL') return useBooster(key);
+    const t=tiles.get(key); if(!t) return;
+    if(t.type==='wall' || t.type==='brk') return;              // not interactable
+    if(t.type==='locked'){ Sfx.blocked(); shakeEl(key); return; } // still locked — no move spent
+    if(t.type==='pivot') return rotate(key);
+    activatePiece(key,t);
+  }
+  function activatePiece(key,t){
+    history.push(snap());
+    moves++;                                    // the move is consumed the instant it's legal
+    if(tutActive){ tutActive=false; store.set('escape.tut.done', true); }
+
     const occ=new Set(tiles.keys()); occ.delete(key);
-    const [dq,dr]=DIRS[t.d];
-    // travel until it leaves the board (escapes) or meets something (stops against it)
-    let x=t.q+dq, y=t.r+dr, lastFree=null, escaped=false;
+    const {dq,dr}=DIRS[t.d];
+    let x=t.q+dq, y=t.r+dr, lastFree=null, escaped=false, brokeKey=null;
     for(;;){
-      if(!board.has(k(x,y))){ escaped=true; break; }
-      if(occ.has(k(x,y))) break;
+      const nk=k(x,y);
+      if(!ground.has(nk)){ escaped=true; break; }
+      if(occ.has(nk)){
+        const occT=tiles.get(nk);
+        if(occT && occT.type==='brk') brokeKey=nk;
+        break;
+      }
       lastFree=[x,y]; x+=dq; y+=dr;
     }
-    history.push(snap());
-    moves++;
     const el=$('escboard').querySelector('[data-k="'+key+'"]');
 
-    if(escaped){                       // clear run — off it goes
+    if(escaped){                                 // clear run — off it goes (or into a hole)
       busy=true; Sfx.slide(); buzz(12);
       if(el){
-        const px=SQ3*(dq+dr/2), py=1.5*dr, mag=Math.hypot(px,py)||1;
+        const [vx,vy]=dirVec(t.d), mag=Math.hypot(vx,vy)||1;
         el.classList.add('fly');
-        el.style.transform='translate(-50%,-50%) translate('+(px/mag*600)+'px,'+(py/mag*600)+'px)';
+        el.style.transform='translate(-50%,-50%) translate('+(vx/mag*640)+'px,'+(vy/mag*640)+'px)';
       }
       setTimeout(()=>{
-        tiles.delete(key); busy=false; updateHud(); render();
-        if(!movable()) win(); else afterMove();
+        tiles.delete(key); busy=false; tickLocks(); updateHud(); render();
+        if(requiredCount()===0) win(); else afterMove();
       },300);
       return;
     }
 
-    if(lastFree){                      // blocked — slides up against it and stays there
+    if(lastFree){                                // blocked — slides up against it and stays
       busy=true; Sfx.blocked(); buzz(18);
       const [lx,ly]=lastFree;
       if(el){
-        const ddx=SQ3*((lx+ly/2)-(t.q+t.r/2)), ddy=1.5*(ly-t.r);
+        const [ddx,ddy]=cellDelta(lx,ly,t.q,t.r);
         el.style.transition='transform .22s ease';
         el.style.transform='translate(-50%,-50%) translate('+(ddx*lastSize)+'px,'+(ddy*lastSize)+'px)';
       }
       setTimeout(()=>{
         tiles.delete(key);
         tiles.set(k(lx,ly), Object.assign({}, t, {q:lx, r:ly}));
-        busy=false; updateHud(); render(); afterMove();
+        if(brokeKey){ tiles.delete(brokeKey); Sfx.boom(); }
+        busy=false; tickLocks(); updateHud(); render(); afterMove();
       },230);
       return;
     }
 
-    Sfx.blocked(); buzz(30); updateHud();     // nothing in front at all — can't budge
+    Sfx.blocked(); buzz(30); updateHud();        // nothing in front at all — can't budge
     if(el){ el.classList.add('shake'); setTimeout(()=>el.classList.remove('shake'),300); }
-    afterMove();
+    tickLocks(); afterMove();
   }
 
   // spin the six cells around a pivot one step, arrows turning with them
@@ -1129,22 +1354,20 @@ const Escape = (()=>{
     const ring=ringOf(pv.q,pv.r);
     const contents=ring.map(([q,r])=>tiles.get(k(q,r))||null);
     const el0=$('escboard').querySelector('[data-k="'+key+'"]');
+    history.push(snap());
     moves++;
-    if(!contents.some(Boolean)){                          // nothing around it to turn
-      history.push(snap());
+    if(!contents.some(Boolean)){                 // nothing around it to turn
       Sfx.blocked(); buzz(30); updateHud();
       if(el0){ el0.classList.add('shake'); setTimeout(()=>el0.classList.remove('shake'),300); }
-      afterMove(); return;
+      tickLocks(); afterMove(); return;
     }
-    history.push(snap());
     busy=true; Sfx.slide(); buzz(18);
-    // slide each occupied neighbour round to the next slot
     for(let i=0;i<6;i++){
       if(!contents[i]) continue;
       const [fq,fr]=ring[i], [tq,tr]=ring[(i+1)%6];
       const e=$('escboard').querySelector('[data-k="'+k(fq,fr)+'"]');
       if(e){
-        const ddx=SQ3*((tq+tr/2)-(fq+fr/2)), ddy=1.5*(tr-fr);
+        const [ddx,ddy]=cellDelta(tq,tr,fq,fr);
         e.style.transition='transform .25s ease';
         e.style.transform='translate(-50%,-50%) translate('+(ddx*lastSize)+'px,'+(ddy*lastSize)+'px)';
       }
@@ -1155,37 +1378,37 @@ const Escape = (()=>{
         const c=contents[i]; if(!c) continue;
         const [tq,tr]=ring[(i+1)%6];
         const moved=Object.assign({}, c, {q:tq, r:tr});
-        if(typeof c.d==='number') moved.d=(c.d+1)%6;      // arrows turn with the piece
+        if(typeof c.d==='number') moved.d=(c.d+1)%6;   // arrows turn with the piece
         tiles.set(k(tq,tr), moved);
       }
-      busy=false; updateHud(); render(); setHint(baseHint()); afterMove();
+      busy=false; tickLocks(); updateHud(); render(); setHint(baseHint()); afterMove();
     },260);
   }
 
   function anyPlay(){
     for(const [key,t] of tiles){
-      if(t.rock) continue;
-      if(t.pivot){
+      if(t.type==='wall' || t.type==='brk' || t.type==='locked') continue;
+      if(t.type==='pivot'){
         if(ringOf(t.q,t.r).some(([a,b])=>tiles.has(k(a,b)))) return true;
         continue;
       }
       const occ=new Set(tiles.keys()); occ.delete(key);
-      const [dq,dr]=DIRS[t.d];
-      const x=t.q+dq, y=t.r+dr;
-      if(!board.has(k(x,y))) return true;
-      if(!occ.has(k(x,y))) return true;
+      const {dq,dr}=DIRS[t.d];
+      const nk=k(t.q+dq,t.r+dr);
+      if(!ground.has(nk)) return true;
+      if(!occ.has(nk)) return true;
     }
     return false;
   }
   function afterMove(){
-    if(!movable()) return;
+    if(requiredCount()===0) return;
     if(moves>=budget){ setTimeout(outOfMoves,260); return; }
     if(!anyPlay()) setTimeout(jammed,260);
   }
   function jammed(){
     Sfx.fail();
     showOverlay({icon:'🧱', title:'Everything is jammed',
-      text:'No hexagon can move. Undo a few taps, or start the level again.',
+      text:'No hexagon can move. Undo a few taps, use a booster, or start over.',
       main:'Try again', onMain:()=>startLevel(level)});
   }
 
@@ -1205,68 +1428,116 @@ const Escape = (()=>{
       showOverlay({icon:'🎉', title:'Level '+level+' cleared!', stars:earned,
         text: earned===3 ? 'Perfect — '+moves+' taps, nothing wasted.'
                          : (assisted ? 'Cleared in '+moves+' taps with a booster.'
-                                     : 'Cleared in '+moves+' taps. Par is '+par+' — no wasted taps for 3 stars.'),
+                                     : 'Cleared in '+moves+' taps. '+par+' is the par for 3 stars.'),
         main:'Next level', onMain:()=>startLevel(Math.min(level+1,MAXLEVEL))});
     },320);
   }
   function outOfMoves(){
     Sfx.fail();
+    const canBuy = mode==='level' && Stars.total()>=EXTRA_MOVES_COST;
     showOverlay({icon:'😅', title:'Out of moves',
-      text:movable()+' hexagons left. Undo a few, or start over.',
-      main:'Try again', onMain:()=>startLevel(level)});
+      text:requiredCount()+' hexagon'+(requiredCount()===1?'':'s')+' still left on the board.',
+      main:'Try again', onMain:()=>startLevel(level),
+      extra: canBuy ? {text:'+'+EXTRA_MOVES+' moves ('+EXTRA_MOVES_COST+'★)', onClick:()=>{
+        if(!Stars.spend(EXTRA_MOVES_COST)){ Sfx.nope(); return; }
+        budget+=EXTRA_MOVES; assisted=true; updateHud(); render();
+      }} : null
+    });
   }
 
   function render(){
     const wrap=$('escboard');
     let minx=1e9,miny=1e9,maxx=-1e9,maxy=-1e9;
-    const pos=cells.map(([q,r])=>{ const x=SQ3*(q+r/2), y=1.5*r;
-      if(x<minx)minx=x; if(x>maxx)maxx=x; if(y<miny)miny=y; if(y>maxy)maxy=y; return [q,r,x,y]; });
-    const avail=Math.min((wrap.parentElement.clientWidth||360)-8, 460);
-    const unitsW=(maxx-minx)+SQ3, unitsH=(maxy-miny)+2;
-    const size=Math.min(avail/unitsW, 320/unitsH, 56); lastSize=size;
-    const tw=SQ3*size, th=2*size;
+    const pos=cells.map(([q,r])=>{
+      const x=1.5*q, y=SQ3*(r+q/2);
+      if(x<minx)minx=x; if(x>maxx)maxx=x; if(y<miny)miny=y; if(y>maxy)maxy=y;
+      return [q,r,x,y];
+    });
+    const parent=wrap.parentElement;
+    const availW=Math.min((parent.clientWidth||360)-8, 480);
+    const availH=Math.min((parent.clientHeight||420)-8, 520);
+    const unitsW=(maxx-minx)+2, unitsH=(maxy-miny)+SQ3;
+    const size=Math.min(availW/unitsW, availH/unitsH, 58); lastSize=size;
+    const tw=2*size, th=SQ3*size;
     wrap.style.width=(unitsW*size)+'px'; wrap.style.height=(unitsH*size)+'px';
     wrap.innerHTML='';
+
     for(const [q,r,x,y] of pos){
-      const key=k(q,r), t=tiles.get(key);
+      const key=k(q,r);
       const el=document.createElement('div');
       el.dataset.k=key;
       el.style.width=tw+'px'; el.style.height=th+'px';
-      el.style.left=((x-minx)+SQ3/2)*size+'px';
-      el.style.top=((y-miny)+1)*size+'px';
-      if(!t){
+      el.style.left=((x-minx)+1)*size+'px';
+      el.style.top=((y-miny)+SQ3/2)*size+'px';
+
+      if(!ground.has(key)){
+        if(!holeSet.has(key)) continue;           // plain void — draw nothing
         el.className='ehole';
-        const hb=document.createElement('div'); hb.className='base';
-        el.appendChild(hb); el.appendChild(document.createElement('i'));
+        el.appendChild(Object.assign(document.createElement('div'),{className:'base'}));
+        el.appendChild(document.createElement('i'));
         wrap.appendChild(el); continue;
       }
-      el.className='etile'+(t.rock?' rock':'')+(t.pivot?' pivot':'')+(armed?' armed':'');
-      const base=document.createElement('div'); base.className='base';
-      const i=document.createElement('i');
-      const col = t.rock ? '#4a4660' : (t.pivot ? 'var(--cell)' : 'var('+COLORS[t.c]+')');
-      base.style.setProperty('--tc',col); i.style.setProperty('--tc',col);
-      el.appendChild(base); el.appendChild(i);
-      const a=document.createElement('div');
-      if(t.pivot){ a.className='tok'; a.textContent='↻'; }
-      else { a.className='arw'; }
-      if(t.rock){ a.textContent='✕'; a.style.opacity='.55'; }
-      else if(!t.pivot){
-        const [dq,dr]=DIRS[t.d];
-        a.textContent='➜';
-        a.style.transform='rotate('+(Math.atan2(1.5*dr, SQ3*(dq+dr/2))*180/Math.PI)+'deg)';
+
+      const t=tiles.get(key);
+      if(!t){
+        el.className='eground'+(eligibleTarget(null)?' armed':'');
+        el.appendChild(Object.assign(document.createElement('div'),{className:'base'}));
+        el.appendChild(document.createElement('i'));
+        if(gmode!=='NORMAL') el.onclick=()=>tap(key);
+        wrap.appendChild(el); continue;
       }
-      el.appendChild(a);
-      if(!t.rock || armed) el.onclick=()=>tap(key);
+
+      el.className='etile '+t.type+(gmode!=='NORMAL' && eligibleTarget(t)?' armed':'');
+      const base=document.createElement('div'); base.className='base';
+      const face=document.createElement('i');
+      const col = t.type==='wall' ? '#4a4660' : t.type==='brk' ? '#a9713f'
+                : t.type==='locked' ? '#232030' : t.type==='pivot' ? 'var(--cell)'
+                : 'var('+COLORS[t.c]+')';
+      base.style.setProperty('--tc',col); face.style.setProperty('--tc',col);
+      el.appendChild(base); el.appendChild(face);
+
+      if(t.type==='pivot'){
+        const tok=document.createElement('div'); tok.className='tok'; tok.textContent='↻';
+        el.appendChild(tok);
+      } else if(t.type==='locked'){
+        const cnt=document.createElement('div'); cnt.className='cnt'; cnt.textContent=t.cnt;
+        el.appendChild(cnt);
+      } else {
+        const arw=document.createElement('div'); arw.className='arw';
+        if(t.type==='wall') arw.innerHTML='<span class="ic">✕</span>';
+        else if(t.type==='brk') arw.innerHTML='<span class="ic">◆</span>';
+        else { arw.style.transform='rotate('+DIRS[t.d].deg+'deg)'; arw.appendChild(Object.assign(document.createElement('div'),{className:'ah'})); }
+        el.appendChild(arw);
+      }
+      el.onclick=()=>tap(key);
       wrap.appendChild(el);
+    }
+
+    if(tutActive){
+      let targetKey=null;
+      for(const [key,t] of tiles){ if(t.type==='normal'){ targetKey=key; break; } }
+      const tgtEl = targetKey ? wrap.querySelector('[data-k="'+targetKey+'"]') : null;
+      if(tgtEl){
+        const hand=document.createElement('div');
+        hand.className='ehand'; hand.textContent='👆';
+        hand.style.left=tgtEl.style.left; hand.style.top=tgtEl.style.top;
+        wrap.appendChild(hand);
+      }
     }
     updateHud();
   }
 
   window.addEventListener('resize',()=>{ if(!screens.escape.hidden) render(); });
-  $('escUndo').onclick=()=>{ if(busy) return; const h=history.pop(); if(h){ tiles=h.tiles; moves=h.moves; armed=null; setHint(baseHint()); render(); } };
-  $('escRestart').onclick=()=>startLevel(level);
-  $('escHammer').onclick=()=>arm('hammer',2);
-  $('escBomb').onclick=()=>arm('bomb',3);
+  $('escUndo').onclick=()=>{
+    if(busy || gmode!=='NORMAL') return;
+    const h=history.pop(); if(h){ tiles=h.tiles; moves=h.moves; render(); }
+  };
+  $('escRestart').onclick=()=>{ if(gmode!=='NORMAL'){ gmode='NORMAL'; syncTargetUI(); } startLevel(level); };
+  $('escBack').onclick=()=>{ gmode='NORMAL'; syncTargetUI(); render(); };
+  $('escMoveBoost').onclick=()=>arm('move');
+  $('escDrill').onclick=()=>arm('drill');
+  $('escHammer').onclick=()=>arm('hammer');
+  $('escBomb').onclick=()=>arm('bomb');
 
   return { enter, start(l){ store.set('escape.level', l); show('escape'); },
            startDaily(day){ pendingDaily=day; show('escape'); } };

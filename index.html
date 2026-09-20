@@ -151,28 +151,30 @@
   #escWrap{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;}
   .escboard{position:relative;margin:auto;}
 
-  .ehud{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px;}
-  .ehud-side{display:flex;gap:8px;}
-  .escbtn{
-    width:44px;height:44px;border:none;border-radius:14px;flex:none;
-    background:linear-gradient(180deg,#5369be,#4053a5);color:#fff;font-size:18px;
+  .ghud{display:flex;align-items:flex-start;justify-content:space-between;gap:4px;margin-bottom:6px;}
+  .ghud-side{display:flex;gap:6px;flex:none;}
+  .gbtn{
+    width:40px;height:40px;border:none;border-radius:13px;flex:none;
+    background:linear-gradient(180deg,#5369be,#4053a5);color:#fff;font-size:16px;
     display:inline-flex;align-items:center;justify-content:center;
     box-shadow:0 3px 0 #2c3872,0 5px 10px rgba(0,0,0,.25);
   }
-  .escbtn:active{transform:translateY(2px);box-shadow:0 1px 0 #2c3872;}
-  .escbtn.ghost{background:var(--surface);color:var(--text);box-shadow:none;border:1px solid var(--line);}
-  .ehud-center{text-align:center;padding-top:1px;}
-  .elevel{
-    display:inline-block;padding:6px 16px;border-radius:10px;white-space:nowrap;
+  .gbtn:active{transform:translateY(2px);box-shadow:0 1px 0 #2c3872;}
+  .gbtn.ghost{background:var(--surface);color:var(--text);box-shadow:none;border:1px solid var(--line);}
+  .ghud-center{text-align:center;padding-top:1px;min-width:0;}
+  .glevel{
+    display:inline-block;padding:6px 13px;border-radius:10px;white-space:nowrap;
     background:linear-gradient(180deg,#5369be,#4053a5);color:#fff;
-    font-weight:700;font-size:12px;letter-spacing:1.2px;text-transform:uppercase;
+    font-weight:700;font-size:11px;letter-spacing:1px;text-transform:uppercase;
     box-shadow:0 2px 0 rgba(0,0,0,.18);
   }
-  .emoves{
-    margin-top:5px;padding:5px 18px 6px;font-weight:700;font-size:14px;color:var(--text);white-space:nowrap;
+  .gstat{
+    width:fit-content;margin:5px auto 0;padding:5px 14px 6px;font-weight:700;font-size:13px;color:var(--text);white-space:nowrap;
     background:var(--surface);border:2px solid #4053a5;
     clip-path:polygon(10% 0,90% 0,100% 50%,90% 100%,10% 100%,0 50%);
   }
+  .gstat-row{display:flex;gap:6px;justify-content:center;margin-top:5px;}
+  .gstat-row .gstat{margin:0;padding:4px 14px 5px;font-size:12px;}
   .etarget{display:flex;align-items:center;gap:10px;margin-bottom:6px;}
   .etarget-text{
     flex:1;font-weight:600;font-size:14px;background:var(--surface);
@@ -180,16 +182,26 @@
   }
 
   .eground,.ehole{position:absolute;transform:translate(-50%,-50%);}
-  .eground .base,.eground i,.ehole .base,.ehole i{
+  .eground .base,.eground i{
     position:absolute;inset:0;display:block;
     clip-path:url(#hexclip);
   }
   .eground .base{background:var(--cell);filter:brightness(.8);transform:translateY(9%);}
   .eground i{background:var(--cell);box-shadow:inset 0 2px 0 rgba(255,255,255,.12);}
-  .ehole{pointer-events:none;}
-  .ehole .base{background:#0a0912;filter:brightness(.55);transform:translateY(6%);}
-  .ehole i{background:#0a0912;box-shadow:inset 0 8px 12px rgba(0,0,0,.65);}
   .eground.armed i{box-shadow:0 0 0 2px var(--accent) inset;}
+  /* a real pit: the rim matches the surrounding ground, the wall is a sloped dark ring
+     lit from above, and the floor is a smaller, flat, matte hex at the very bottom */
+  .ehole{pointer-events:none;}
+  .ehole .rim{position:absolute;inset:0;display:block;clip-path:url(#hexclip);background:var(--cell);filter:brightness(.76);}
+  .ehole .wall{
+    position:absolute;inset:6%;display:block;clip-path:url(#hexclip);
+    background:linear-gradient(165deg,#2a2636 0%,#15121e 55%,#0a0812 100%);
+    box-shadow:inset 0 7px 10px rgba(0,0,0,.6),inset 0 -2px 4px rgba(255,255,255,.05);
+  }
+  .ehole .floor{
+    position:absolute;inset:19%;display:block;clip-path:url(#hexclip);
+    background:#060509;box-shadow:inset 0 2px 5px rgba(0,0,0,.7);
+  }
 
   .etile{position:absolute;transform:translate(-50%,-50%);cursor:pointer;filter:drop-shadow(0 3px 5px rgba(0,0,0,.28));}
   .etile .base{
@@ -233,13 +245,14 @@
 
   @keyframes eshake{0%,100%{transform:translate(-50%,-50%)}25%{transform:translate(-58%,-50%)}75%{transform:translate(-42%,-50%)}}
   .etile.shake,.eground.shake{animation:eshake .26s ease;}
-  .etile.fly{transition:transform .32s cubic-bezier(.4,0,.9,.4),opacity .32s ease;opacity:0;}
+  .etile.fly{transition:transform .38s cubic-bezier(.35,0,.75,.4),opacity .38s ease .12s;opacity:0;z-index:6;}
+  .etile.sink{transition:transform .32s cubic-bezier(.6,0,1,.5),opacity .32s ease .1s;opacity:0;}
 
   .ehand{position:absolute;transform:translate(-50%,-70%);font-size:32px;pointer-events:none;z-index:5;
     animation:handbob 1s ease-in-out infinite;filter:drop-shadow(0 4px 6px rgba(0,0,0,.45));}
   @keyframes handbob{0%,100%{transform:translate(-50%,-70%) scale(1)}50%{transform:translate(-50%,-42%) scale(.9)}}
 
-  .eboosters{display:flex;gap:12px;justify-content:center;padding:8px 0 2px;}
+  .gboosters{display:flex;gap:12px;justify-content:center;padding:8px 0 2px;}
   .boosterbtn{
     position:relative;width:54px;height:54px;border:none;border-radius:16px;flex:none;
     background:linear-gradient(180deg,#5fd3e8,#2fb3cc);font-size:23px;
@@ -255,7 +268,7 @@
     display:flex;align-items:center;justify-content:center;
     box-shadow:0 2px 4px rgba(0,0,0,.3),0 0 0 2px #fff;
   }
-  .estars{margin:6px auto 0;width:max-content;}
+  .gstars{margin:6px auto 0;width:max-content;}
 
   /* ---- level select ---- */
   .lvgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;overflow-y:auto;padding-bottom:16px;align-content:start;flex:1;}
@@ -341,83 +354,87 @@
 
   <!-- ===== BALL SORT ===== -->
   <section id="ball" class="stage" hidden>
-    <div class="bar">
-      <button class="iconbtn" data-home>‹ Menu</button>
-      <div class="spacer"></div>
-      <div class="pill"><small>Moves</small> <span id="ballMoves">0</span><small>/ par</small> <span id="ballPar">0</span></div>
-    </div>
-    <div class="bar">
-      <button class="iconbtn" id="ballUndo">↶</button>
-      <button class="iconbtn" id="ballRestart">↻</button>
-      <button class="iconbtn" data-levels="ball">☰</button>
-      <button class="iconbtn" data-sfx>🔊</button>
-      <div class="spacer"></div>
-      <div class="pill"><small>Level</small> <span id="ballLevel">1</span></div>
-    </div>
-    <div class="bar" style="margin-bottom:4px;">
-      <button class="iconbtn" id="buyTube">➕ Tube <small style="color:var(--accent)">3★</small></button>
-      <button class="iconbtn" id="buyHint">💡 Hint <small style="color:var(--accent)">2★</small></button>
-      <div class="spacer"></div>
-      <div class="pill gold">★ <span id="ballStars">0</span></div>
+    <div class="ghud">
+      <div class="ghud-side">
+        <button class="gbtn" data-home title="Home">🏠</button>
+        <button class="gbtn" id="ballRestart" title="Restart">↻</button>
+      </div>
+      <div class="ghud-center">
+        <div class="glevel">LEVEL <span id="ballLevel">1</span></div>
+        <div class="gstat">Moves: <span id="ballMoves">0</span> <small>/ par <span id="ballPar">0</span></small></div>
+      </div>
+      <div class="ghud-side">
+        <button class="gbtn ghost" id="ballUndo" title="Undo">↶</button>
+        <button class="gbtn ghost" data-sfx title="Sound">🔊</button>
+        <button class="gbtn ghost" data-levels="ball" title="Levels">☰</button>
+      </div>
     </div>
     <div class="hint" id="ballHint">Tap a tube, then tap where to pour.</div>
     <div id="ballWrap"><div class="tubes" id="tubes"></div></div>
+    <div class="gboosters">
+      <button class="boosterbtn" id="buyTube" title="Extra tube"><span>➕</span><span class="badge">3★</span></button>
+      <button class="boosterbtn" id="buyHint" title="Hint"><span>💡</span><span class="badge">2★</span></button>
+    </div>
+    <div class="pill gold gstars">★ <span id="ballStars">0</span></div>
   </section>
 
   <!-- ===== FLOW ===== -->
   <section id="flow" class="stage" hidden>
-    <div class="bar">
-      <button class="iconbtn" data-home>‹ Menu</button>
-      <div class="spacer"></div>
-      <div class="pill"><small>Pipes</small> <span id="flowDone">0</span>/<span id="flowTotal">0</span></div>
-      <div class="pill"><small>Filled</small> <span id="flowFill">0</span>%</div>
-    </div>
-    <div class="bar">
-      <button class="iconbtn" id="flowClear">↻</button>
-      <button class="iconbtn" data-levels="flow">☰</button>
-      <button class="iconbtn" data-sfx>🔊</button>
-      <div class="spacer"></div>
-      <div class="pill"><small>Level</small> <span id="flowLevel">1</span></div>
-    </div>
-    <div class="bar" style="margin-bottom:4px;">
-      <button class="iconbtn" id="flowHintBtn">💡 Hint <small style="color:var(--accent)">2★</small></button>
-      <div class="spacer"></div>
-      <div class="pill gold">★ <span id="flowStars">0</span></div>
+    <div class="ghud">
+      <div class="ghud-side">
+        <button class="gbtn" data-home title="Home">🏠</button>
+        <button class="gbtn" id="flowClear" title="Restart">↻</button>
+      </div>
+      <div class="ghud-center">
+        <div class="glevel">LEVEL <span id="flowLevel">1</span></div>
+        <div class="gstat-row">
+          <div class="gstat">Pipes <span id="flowDone">0</span>/<span id="flowTotal">0</span></div>
+          <div class="gstat">Filled <span id="flowFill">0</span>%</div>
+        </div>
+      </div>
+      <div class="ghud-side">
+        <button class="gbtn ghost" data-sfx title="Sound">🔊</button>
+        <button class="gbtn ghost" data-levels="flow" title="Levels">☰</button>
+      </div>
     </div>
     <div class="hint" id="flowHint">Drag from a dot to its twin. Fill every square to win.</div>
     <div id="flowWrap"><div class="flowgrid" id="flowgrid"></div></div>
+    <div class="gboosters">
+      <button class="boosterbtn" id="flowHintBtn" title="Hint"><span>💡</span><span class="badge">2★</span></button>
+    </div>
+    <div class="pill gold gstars">★ <span id="flowStars">0</span></div>
   </section>
 
   <!-- ===== HEXA ESCAPE ===== -->
   <section id="escape" class="stage" hidden>
-    <div class="ehud" id="escHud">
-      <div class="ehud-side">
-        <button class="escbtn" data-home title="Home">🏠</button>
-        <button class="escbtn" id="escRestart" title="Restart">↻</button>
+    <div class="ghud" id="escHud">
+      <div class="ghud-side">
+        <button class="gbtn" data-home title="Home">🏠</button>
+        <button class="gbtn" id="escRestart" title="Restart">↻</button>
       </div>
-      <div class="ehud-center">
-        <div class="elevel" id="escLevelBadge">LEVEL 1</div>
-        <div class="emoves">Moves: <span id="escMoves">0</span></div>
+      <div class="ghud-center">
+        <div class="glevel" id="escLevelBadge">LEVEL 1</div>
+        <div class="gstat">Moves: <span id="escMoves">0</span></div>
       </div>
-      <div class="ehud-side">
-        <button class="escbtn ghost" id="escUndo" title="Undo">↶</button>
-        <button class="escbtn ghost" data-sfx title="Sound">🔊</button>
-        <button class="escbtn ghost" data-levels="escape" title="Levels">☰</button>
+      <div class="ghud-side">
+        <button class="gbtn ghost" id="escUndo" title="Undo">↶</button>
+        <button class="gbtn ghost" data-sfx title="Sound">🔊</button>
+        <button class="gbtn ghost" data-levels="escape" title="Levels">☰</button>
       </div>
     </div>
     <div class="etarget" id="escTarget" hidden>
-      <button class="escbtn" id="escBack" title="Back">‹</button>
+      <button class="gbtn" id="escBack" title="Back">‹</button>
       <div class="etarget-text" id="escTargetText">Tap a tile</div>
     </div>
     <div class="hint" id="escHint">Tap a hex — it flies off the way its arrow points.</div>
     <div id="escWrap"><div class="escboard" id="escboard"></div></div>
-    <div class="eboosters">
+    <div class="gboosters">
       <button class="boosterbtn" id="escMoveBoost" title="Extra move"><span>➕</span><span class="badge">1★</span></button>
       <button class="boosterbtn" id="escDrill" title="Drill a hole"><span>🛠️</span><span class="badge">2★</span></button>
       <button class="boosterbtn" id="escHammer" title="Hammer"><span>🔨</span><span class="badge">2★</span></button>
       <button class="boosterbtn" id="escBomb" title="Bomb"><span>💣</span><span class="badge">3★</span></button>
     </div>
-    <div class="pill gold estars">★ <span id="escStars">0</span></div>
+    <div class="pill gold gstars">★ <span id="escStars">0</span></div>
   </section>
 
   <!-- ===== LEVEL SELECT ===== -->
@@ -1409,47 +1426,62 @@ const Escape = (()=>{
 
     const occ=new Set(tiles.keys()); occ.delete(key);
     const {dq,dr}=DIRS[t.d];
-    let x=t.q+dq, y=t.r+dr, lastFree=null, escaped=false, brokeKey=null;
+    let x=t.q+dq, y=t.r+dr, lastFree=null, escaped=false, intoHole=false, brokeKey=null, steps=0;
     for(;;){
       const nk=k(x,y);
-      if(!ground.has(nk)){ escaped=true; break; }
+      if(!ground.has(nk)){ escaped=true; intoHole=holeSet.has(nk); break; }
       if(occ.has(nk)){
         const occT=tiles.get(nk);
         if(occT && occT.type==='brk') brokeKey=nk;
         break;
       }
-      lastFree=[x,y]; x+=dq; y+=dr;
+      lastFree=[x,y]; x+=dq; y+=dr; steps++;
     }
     const el=$('escboard').querySelector('[data-k="'+key+'"]');
+    const spin = (Math.random()<0.5?-1:1) * (300 + ((Math.random()*180)|0));   // a little variety so every roll doesn't look identical
 
-    if(escaped){                                 // clear run — off it goes (or into a hole)
-      busy=true; Sfx.slide(); buzz(12);
+    if(escaped && intoHole){                     // rolls right up to the lip, then drops in
+      busy=true; Sfx.drill(); buzz(16);
       if(el){
-        const [vx,vy]=dirVec(t.d), mag=Math.hypot(vx,vy)||1;
-        el.classList.add('fly');
-        el.style.transform='translate(-50%,-50%) translate('+(vx/mag*640)+'px,'+(vy/mag*640)+'px)';
+        el.classList.add('sink');
+        el.style.transform='translate(-50%,-50%) scale(.1) rotate('+spin+'deg)';
       }
       setTimeout(()=>{
         tiles.delete(key); busy=false; tickLocks(); updateHud(); render();
         if(requiredCount()===0) win(); else afterMove();
-      },300);
+      },320);
       return;
     }
 
-    if(lastFree){                                // blocked — slides up against it and stays
+    if(escaped){                                 // clear run — rolls off the edge and away
+      busy=true; Sfx.slide(); buzz(12);
+      if(el){
+        const [vx,vy]=dirVec(t.d), mag=Math.hypot(vx,vy)||1;
+        el.classList.add('fly');
+        el.style.transform='translate(-50%,-50%) translate('+(vx/mag*640)+'px,'+(vy/mag*640)+'px) rotate('+spin+'deg) scale(.4)';
+      }
+      setTimeout(()=>{
+        tiles.delete(key); busy=false; tickLocks(); updateHud(); render();
+        if(requiredCount()===0) win(); else afterMove();
+      },380);
+      return;
+    }
+
+    if(lastFree){                                // blocked — rolls up against it and stays
       busy=true; Sfx.blocked(); buzz(18);
       const [lx,ly]=lastFree;
       if(el){
         const [ddx,ddy]=cellDelta(lx,ly,t.q,t.r);
-        el.style.transition='transform .22s ease';
-        el.style.transform='translate(-50%,-50%) translate('+(ddx*lastSize)+'px,'+(ddy*lastSize)+'px)';
+        const roll=Math.min(steps,4)*(dq+dr>=0?120:-120);
+        el.style.transition='transform .24s cubic-bezier(.3,.6,.4,1)';
+        el.style.transform='translate(-50%,-50%) translate('+(ddx*lastSize)+'px,'+(ddy*lastSize)+'px) rotate('+roll+'deg)';
       }
       setTimeout(()=>{
         tiles.delete(key);
         tiles.set(k(lx,ly), Object.assign({}, t, {q:lx, r:ly}));
         if(brokeKey){ tiles.delete(brokeKey); Sfx.boom(); }
         busy=false; tickLocks(); updateHud(); render(); afterMove();
-      },230);
+      },240);
       return;
     }
 
@@ -1604,8 +1636,9 @@ const Escape = (()=>{
       if(!ground.has(key)){
         if(!holeSet.has(key)) continue;           // plain void — draw nothing
         el.className='ehole';
-        el.appendChild(Object.assign(document.createElement('div'),{className:'base'}));
-        el.appendChild(document.createElement('i'));
+        el.appendChild(Object.assign(document.createElement('div'),{className:'rim'}));
+        el.appendChild(Object.assign(document.createElement('div'),{className:'wall'}));
+        el.appendChild(Object.assign(document.createElement('div'),{className:'floor'}));
         wrap.appendChild(el); continue;
       }
 

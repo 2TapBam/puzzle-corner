@@ -106,6 +106,27 @@
   .gamecard .go{margin-left:auto;color:var(--muted);font-size:24px;}
   .menufoot{display:flex;align-items:center;justify-content:center;gap:10px;}
 
+  /* ---- save data ---- */
+  .sd-scroll{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:14px;padding-bottom:20px;}
+  .sd-card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px;}
+  .sd-card b{display:block;font-size:16px;margin-bottom:6px;}
+  .sd-card p{margin:0 0 10px;color:var(--muted);font-size:13px;}
+  .sd-row{display:flex;justify-content:space-between;padding:6px 0;font-size:14px;border-top:1px solid var(--line);}
+  .sd-row:first-of-type{border-top:none;}
+  .sd-textarea{
+    width:100%;resize:vertical;margin-bottom:10px;padding:10px;border-radius:12px;
+    background:var(--surface2);border:1px solid var(--line);color:var(--text);
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;word-break:break-all;
+  }
+  .sd-msg{margin:8px 0 0;font-size:13px;color:var(--ok);}
+  .sd-msg.err{color:var(--accent2);}
+  .sd-jump{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+  .sd-jump span{flex:1;font-size:14px;}
+  .sd-input{
+    width:70px;height:40px;border-radius:12px;border:1px solid var(--line);
+    background:var(--surface2);color:var(--text);text-align:center;font-size:15px;font-weight:600;
+  }
+
   /* ---- shared play ---- */
   .stage{flex:1;display:flex;flex-direction:column;}
   .hint{color:var(--muted);font-size:14px;text-align:center;min-height:20px;margin:2px 0 10px;}
@@ -359,6 +380,54 @@
       <div class="pill gold">★ <span id="menuStars">0</span></div>
       <button class="iconbtn" data-sfx>🔊</button>
       <button class="iconbtn" id="themeBtn">🌙</button>
+      <button class="iconbtn" id="saveDataBtn" title="Save data">💾</button>
+    </div>
+  </section>
+
+  <!-- ===== SAVE DATA ===== -->
+  <section id="savedata" class="stage" hidden>
+    <div class="bar">
+      <button class="iconbtn" data-home>‹ Menu</button>
+    </div>
+    <div class="hint">Back up your progress before reinstalling, restore it after, or jump straight to a level.</div>
+    <div class="sd-scroll">
+      <div class="sd-card">
+        <b>Your progress</b>
+        <div class="sd-row"><span>★ Stars</span><span id="sdStars">0</span></div>
+        <div class="sd-row"><span>🧪 Ball Sort</span><span id="sdBall">Level 1</span></div>
+        <div class="sd-row"><span>🔗 Flow</span><span id="sdFlow">Level 1</span></div>
+        <div class="sd-row"><span>➡️ Hexa Escape</span><span id="sdEscape">Level 1</span></div>
+      </div>
+
+      <div class="sd-card">
+        <b>Backup code</b>
+        <p>Copy this before you reinstall or switch devices.</p>
+        <textarea id="sdCode" class="sd-textarea" rows="3" readonly></textarea>
+        <button class="btn" id="sdCopy">Copy code</button>
+        <p id="sdCopyMsg" class="sd-msg" hidden>Copied!</p>
+      </div>
+
+      <div class="sd-card">
+        <b>Restore from a code</b>
+        <p>Paste a backup code you saved earlier, then restore.</p>
+        <textarea id="sdRestoreInput" class="sd-textarea" rows="3" placeholder="Paste your backup code here"></textarea>
+        <button class="btn ghost" id="sdRestore">Restore</button>
+        <p id="sdRestoreMsg" class="sd-msg" hidden></p>
+      </div>
+
+      <div class="sd-card">
+        <b>Jump to a level</b>
+        <p>Set any game straight to a level number — no need to play up to it.</p>
+        <div class="sd-jump"><span>🧪 Ball Sort</span><input type="number" min="1" max="1000" id="sdBallLv" class="sd-input"><button class="iconbtn" data-jump="ball">Go</button></div>
+        <div class="sd-jump"><span>🔗 Flow</span><input type="number" min="1" max="1000" id="sdFlowLv" class="sd-input"><button class="iconbtn" data-jump="flow">Go</button></div>
+        <div class="sd-jump"><span>➡️ Hexa Escape</span><input type="number" min="1" max="1000" id="sdEscapeLv" class="sd-input"><button class="iconbtn" data-jump="escape">Go</button></div>
+      </div>
+
+      <div class="sd-card">
+        <b>Start over</b>
+        <p>Wipes stars, levels, and settings on this device. Can't be undone.</p>
+        <button class="btn ghost" id="sdReset">Reset everything</button>
+      </div>
     </div>
   </section>
 
@@ -575,7 +644,7 @@ const Stars = (()=>{
 })();
 
 /* ---------- screens ---------- */
-const screens = { menu:$('menu'), ball:$('ball'), flow:$('flow'), escape:$('escape'), levels:$('levels') };
+const screens = { menu:$('menu'), ball:$('ball'), flow:$('flow'), escape:$('escape'), levels:$('levels'), savedata:$('savedata') };
 function show(name){
   for(const k in screens) screens[k].hidden = (k!==name);
   document.documentElement.classList.toggle('esc-active', name==='escape');
@@ -585,6 +654,7 @@ function show(name){
   if(name==='ball') Ball.enter();
   if(name==='flow') Flow.enter();
   if(name==='escape') Escape.enter();
+  if(name==='savedata') SaveData.enter();
 }
 document.querySelectorAll('[data-go]').forEach(b=> b.onclick=()=>show(b.dataset.go));
 document.querySelectorAll('[data-home]').forEach(b=> b.onclick=()=>show('menu'));
@@ -1798,6 +1868,84 @@ const Daily = (()=>{
   return { open, complete, streak, doneToday, syncCard };
 })();
 $('dailyCard').onclick=()=>{ Sfx.tap(); Daily.open(); };
+
+/* =========================================================
+   SAVE DATA — a copy/paste backup code, and a manual level jump,
+   since there's no account/cloud sync: everything lives in this
+   browser's localStorage only, and a reinstall or a new device
+   starts from nothing unless the player has a code to restore.
+   ========================================================= */
+const SaveData = (()=>{
+  function summary(){
+    $('sdStars').textContent = Stars.total();
+    $('sdBall').textContent = 'Level '+store.get('ball.level',1);
+    $('sdFlow').textContent = 'Level '+store.get('flow.level',1);
+    $('sdEscape').textContent = 'Level '+store.get('escape.level',1);
+  }
+  function makeCode(){
+    const obj={};
+    for(let i=0;i<localStorage.length;i++){ const k=localStorage.key(i); obj[k]=localStorage.getItem(k); }
+    try{ return btoa(unescape(encodeURIComponent(JSON.stringify(obj)))); }catch(e){ return ''; }
+  }
+  function applyCode(code){
+    let obj;
+    try{ obj=JSON.parse(decodeURIComponent(escape(atob(code.trim())))); }
+    catch(e){ return false; }
+    if(!obj || typeof obj!=='object') return false;
+    for(const k in obj) localStorage.setItem(k, obj[k]);
+    return true;
+  }
+  function enter(){
+    summary();
+    $('sdCode').value = makeCode();
+    $('sdCopyMsg').hidden = true;
+    $('sdRestoreMsg').hidden = true;
+    $('sdRestoreInput').value = '';
+    $('sdBallLv').value = store.get('ball.level',1);
+    $('sdFlowLv').value = store.get('flow.level',1);
+    $('sdEscapeLv').value = store.get('escape.level',1);
+  }
+  return { enter, makeCode, applyCode, summary };
+})();
+$('saveDataBtn').onclick = ()=>{ Sfx.tap(); show('savedata'); };
+$('sdCopy').onclick = async ()=>{
+  const code=$('sdCode').value;
+  try{ await navigator.clipboard.writeText(code); }
+  catch(e){ $('sdCode').select(); try{ document.execCommand('copy'); }catch(e2){} }
+  Sfx.tap();
+  const m=$('sdCopyMsg'); m.hidden=false; m.textContent='Copied!'; m.className='sd-msg';
+};
+$('sdRestore').onclick = ()=>{
+  const code=$('sdRestoreInput').value;
+  const m=$('sdRestoreMsg');
+  if(!code.trim()){ m.hidden=false; m.className='sd-msg err'; m.textContent='Paste a code first.'; Sfx.nope(); return; }
+  if(SaveData.applyCode(code)){
+    Sfx.done();
+    m.hidden=false; m.className='sd-msg'; m.textContent='Restored — reloading…';
+    setTimeout(()=>location.reload(), 500);
+  } else {
+    Sfx.nope();
+    m.hidden=false; m.className='sd-msg err'; m.textContent="That code doesn't look right.";
+  }
+};
+document.querySelectorAll('[data-jump]').forEach(b=>{
+  b.onclick=()=>{
+    const game=b.dataset.jump;
+    const input=$('sd'+game[0].toUpperCase()+game.slice(1)+'Lv');
+    let n=parseInt(input.value,10);
+    if(!n || n<1) n=1; if(n>MAXLEVEL) n=MAXLEVEL;
+    store.set(game+'.level', n);
+    if(n>maxUnlocked(game)) store.set(game+'.max', n);
+    Sfx.tap();
+    MODULES[game].start(n);
+  };
+});
+$('sdReset').onclick = ()=>{
+  if(!confirm('Reset all progress, stars, and settings on this device? This cannot be undone.')) return;
+  localStorage.clear();
+  Sfx.boom();
+  location.reload();
+};
 
 /* ---------- theme ---------- */
 function applyTheme(t){

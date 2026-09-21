@@ -273,7 +273,7 @@
     box-shadow:0 0 0 3px #fff,0 3px 7px rgba(0,0,0,.45);pointer-events:none;
   }
   .etile.pivot .tok{background:#fdfcff;color:#232030;box-shadow:0 0 0 3px #232030,0 3px 7px rgba(0,0,0,.4);}
-  .earm{position:absolute;border-radius:4px;background:#22212b;transform-origin:0 50%;box-shadow:0 1px 1px rgba(255,255,255,.12) inset;}
+  .earm{position:absolute;border-radius:4px;background:#22212b;transform-origin:0 50%;box-shadow:0 1px 1px rgba(255,255,255,.12) inset;pointer-events:none;}
 
   @keyframes eshake{0%,100%{transform:translate(-50%,-50%)}25%{transform:translate(-58%,-50%)}75%{transform:translate(-42%,-50%)}}
   .etile.shake,.eground.shake{animation:eshake .26s ease;}
@@ -1252,6 +1252,7 @@ const Escape = (()=>{
   // so removing pieces in reverse placement order is always a valid, guaranteed solution
   function generate(n, nWalls, nBrk, nLocked, nPivots, rnd){
     const occ=new Set(), out=new Map();
+    let decoyCount=0;
     const emptyCells=()=>cells.filter(([q,r])=>ground.has(k(q,r)) && !occ.has(k(q,r)));
 
     // interior cells get placed first (low placement index), boundary cells last (high index).
@@ -1279,7 +1280,9 @@ const Escape = (()=>{
       if(!opts.length) break;
       const [q,r]=opts[(rnd()*opts.length)|0];
       // a rotator only grabs the 2 or 4 neighbours at the end of its arms, not the whole ring
-      const numArms = rnd()<0.5 ? 2 : 4;
+      // biased toward 2 arms: fewer arms means fewer OTHER occupied slots to rule out
+      // below, so a rotator is far more likely to end up genuinely necessary, not decorative
+      const numArms = rnd()<0.75 ? 2 : 4;
       const dirIdx=[0,1,2,3,4,5];
       for(let s=dirIdx.length-1;s>0;s--){ const j=(rnd()*(s+1))|0; [dirIdx[s],dirIdx[j]]=[dirIdx[j],dirIdx[s]]; }
       const arms=dirIdx.slice(0,numArms).sort((a,b)=>a-b);
@@ -1381,7 +1384,41 @@ const Escape = (()=>{
         toLock--;
       }
     }
-    return out;
+
+    // a rotator that nothing ever actually needs is just decoration. For each pivot, try to
+    // plant one piece that genuinely requires it: blocked sitting in one arm slot, but clear
+    // once rotated into the next slot over. It's added fresh, right at the end -- the highest
+    // placement index there is -- so it's the very first thing removed in the guaranteed solve,
+    // meaning the board is still in exactly the state used to check "blocked here, clear there".
+    for(const piv of out.values()){
+      if(piv.type!=='pivot') continue;
+      const slots=piv.arms.map(d=>({d,q:piv.q+DIRS[d].dq,r:piv.r+DIRS[d].dr}));
+      const tryOrder=[...slots.keys()];
+      for(let s=tryOrder.length-1;s>0;s--){ const j=(rnd()*(s+1))|0; [tryOrder[s],tryOrder[j]]=[tryOrder[j],tryOrder[s]]; }
+      let done=false;
+      for(const i of tryOrder){
+        const P0=slots[i], keyP0=k(P0.q,P0.r);
+        if(occ.has(keyP0)) continue;                     // needs an empty slot to place into
+        // every OTHER arm on this pivot must also be empty -- rotating to free the decoy
+        // would otherwise relocate whatever already sits there too, and that piece's own
+        // placement was only ever validated to be safe sitting exactly where it is
+        if(slots.some((s,si)=>si!==i && occ.has(k(s.q,s.r)))) continue;
+        const P1=slots[(i+1)%slots.length];
+        const turnSteps=Math.round((((DIRS[P1.d].deg-DIRS[P0.d].deg)+360)%360)/60);
+        const dirsTry=[0,1,2,3,4,5];
+        for(let s=dirsTry.length-1;s>0;s--){ const j=(rnd()*(s+1))|0; [dirsTry[s],dirsTry[j]]=[dirsTry[j],dirsTry[s]]; }
+        for(const d0 of dirsTry){
+          if(pathClear(occ,P0.q,P0.r,d0)) continue;       // must be BLOCKED sitting here as-is
+          const d1=(d0+turnSteps)%6;
+          if(!pathClear(occ,P1.q,P1.r,d1)) continue;      // must be CLEAR once rotated over
+          out.set(keyP0,{type:'normal',q:P0.q,r:P0.r,d:d0,c:(rnd()*8)|0});
+          occ.add(keyP0); order.push(keyP0); decoyCount++;
+          done=true; break;
+        }
+        if(done) break;
+      }
+    }
+    return {tiles:out, decoyCount};
   }
 
   function requiredCount(){ let n=0; for(const t of tiles.values()) if(t.type==='normal'||t.type==='locked') n++; return n; }
@@ -1399,8 +1436,12 @@ const Escape = (()=>{
     const reserve=Math.max(2, Math.round(cells.length*0.05));
     const obstacleBudget=opts.walls+opts.brk+opts.pivots;
     const n=Math.max(4, Math.min(Math.round(cells.length*0.82), cells.length-obstacleBudget-reserve));
-    tiles=generate(n, opts.walls, opts.brk, opts.locked, opts.pivots, rnd);
-    par=requiredCount(); budget=par+3; moves=0; assisted=false; gmode='NORMAL'; busy=false; history=[];
+    const result=generate(n, opts.walls, opts.brk, opts.locked, opts.pivots, rnd);
+    tiles=result.tiles;
+    // a piece planted to genuinely require the rotator costs one extra move (the rotate
+    // itself) beyond its own tap, even played perfectly -- par has to include that or a
+    // level with several of them becomes impossible to 3-star, or even to finish in budget
+    par=requiredCount()+result.decoyCount; budget=par+3; moves=0; assisted=false; gmode='NORMAL'; busy=false; history=[];
     syncTargetUI(); updateHud(); Stars.sync(); render();
   }
   function startLevel(l){

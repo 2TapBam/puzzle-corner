@@ -213,17 +213,18 @@
   }
 
   .eground,.ehole{position:absolute;transform:translate(-50%,-50%);}
-  .eground .base,.eground i{
-    position:absolute;inset:0;display:block;
-    clip-path:url(#hexclip);
+  /* the ground itself stays flat/matte -- no fake extrusion -- so a hole reads as an
+     actual opening cut into a flat surface instead of just another raised tile */
+  .eground .base{display:none;}
+  .eground i{
+    position:absolute;inset:0;display:block;clip-path:url(#hexclip);
+    background:var(--cell);
   }
-  .eground .base{background:var(--cell);filter:brightness(.8);transform:translateY(9%);}
-  .eground i{background:var(--cell);box-shadow:inset 0 2px 0 rgba(255,255,255,.12);}
   .eground.armed i{box-shadow:0 0 0 2px var(--accent) inset;}
-  /* a real pit: the rim matches the surrounding ground, the wall is a sloped dark ring
+  /* a real pit: the rim matches the surrounding flat ground, the wall is a sloped dark ring
      lit from above, and the floor is a smaller, flat, matte hex at the very bottom */
   .ehole{pointer-events:none;}
-  .ehole .rim{position:absolute;inset:0;display:block;clip-path:url(#hexclip);background:var(--cell);filter:brightness(.76);}
+  .ehole .rim{position:absolute;inset:0;display:block;clip-path:url(#hexclip);background:var(--cell);}
   .ehole .wall{
     position:absolute;inset:6%;display:block;clip-path:url(#hexclip);
     background:linear-gradient(165deg,#2a2636 0%,#15121e 55%,#0a0812 100%);
@@ -1541,16 +1542,27 @@ const Escape = (()=>{
     const el=$('escboard').querySelector('[data-k="'+key+'"]');
     const spin = (Math.random()<0.5?-1:1) * (300 + ((Math.random()*180)|0));   // a little variety so every roll doesn't look identical
 
-    if(escaped && intoHole){                     // rolls right up to the lip, then drops in
-      busy=true; Sfx.drill(); buzz(16);
+    if(escaped && intoHole){                     // rolls across every cell in between, THEN drops in
+      busy=true; Sfx.slide(); buzz(12);
+      const [hdx,hdy]=cellDelta(x,y,t.q,t.r);
+      const travelDur=Math.min(140+steps*90, 600);
       if(el){
-        el.classList.add('sink');
-        el.style.transform='translate(-50%,-50%) scale(.1) rotate('+spin+'deg)';
+        const roll=Math.min(steps,5)*130*(dq+dr>=0?1:-1);
+        el.style.transition='transform '+travelDur+'ms cubic-bezier(.3,.6,.4,1)';
+        el.style.transform='translate(-50%,-50%) translate('+(hdx*lastSize)+'px,'+(hdy*lastSize)+'px) rotate('+roll+'deg)';
       }
       setTimeout(()=>{
-        tiles.delete(key); busy=false; tickLocks(); updateHud(); render();
-        if(requiredCount()===0) win(); else afterMove();
-      },320);
+        Sfx.drill(); buzz(16);
+        if(el){
+          el.classList.add('sink');
+          el.style.transition='transform .32s cubic-bezier(.6,0,1,.5),opacity .32s ease .1s';
+          el.style.transform='translate(-50%,-50%) translate('+(hdx*lastSize)+'px,'+(hdy*lastSize)+'px) scale(.1) rotate('+spin+'deg)';
+        }
+        setTimeout(()=>{
+          tiles.delete(key); busy=false; tickLocks(); updateHud(); render();
+          if(requiredCount()===0) win(); else afterMove();
+        },320);
+      },travelDur);
       return;
     }
 
@@ -1712,20 +1724,6 @@ const Escape = (()=>{
     wrap.style.width=(unitsW*size)+'px'; wrap.style.height=(unitsH*size)+'px';
     wrap.innerHTML='';
 
-    // draw rotator arm lines first, so every piece paints on top of them
-    for(const [q,r,x,y] of pos){
-      const t=tiles.get(k(q,r));
-      if(!t || t.type!=='pivot') continue;
-      const left=((x-minx)+1)*size, top=((y-miny)+SQ3/2)*size;
-      for(const d of t.arms){
-        const arm=document.createElement('div'); arm.className='earm';
-        arm.style.left=left+'px'; arm.style.top=top+'px';
-        arm.style.width=(SQ3*size*0.96)+'px'; arm.style.height=Math.max(3,size*0.09)+'px';
-        arm.style.transform='translateY(-50%) rotate('+(DIRS[d].deg-90)+'deg)';
-        wrap.appendChild(arm);
-      }
-    }
-
     for(const [q,r,x,y] of pos){
       const key=k(q,r);
       const el=document.createElement('div');
@@ -1776,6 +1774,21 @@ const Escape = (()=>{
       }
       el.onclick=()=>tap(key);
       wrap.appendChild(el);
+    }
+
+    // rotator arm lines drawn last, on top of every tile, so the arm is actually visible
+    // connecting the hub to its held slots instead of hiding underneath the pieces there
+    for(const [q,r,x,y] of pos){
+      const t=tiles.get(k(q,r));
+      if(!t || t.type!=='pivot') continue;
+      const left=((x-minx)+1)*size, top=((y-miny)+SQ3/2)*size;
+      for(const d of t.arms){
+        const arm=document.createElement('div'); arm.className='earm';
+        arm.style.left=left+'px'; arm.style.top=top+'px';
+        arm.style.width=(SQ3*size*0.96)+'px'; arm.style.height=Math.max(3,size*0.09)+'px';
+        arm.style.transform='translateY(-50%) rotate('+(DIRS[d].deg-90)+'deg)';
+        wrap.appendChild(arm);
+      }
     }
 
     if(tutActive){

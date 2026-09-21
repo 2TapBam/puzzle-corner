@@ -386,8 +386,10 @@
 
   <!-- ===== SAVE DATA ===== -->
   <section id="savedata" class="stage" hidden>
-    <div class="bar">
-      <button class="iconbtn" data-home>‹ Menu</button>
+    <div class="ghud">
+      <div class="ghud-side"><button class="gbtn" data-home title="Menu">🏠</button></div>
+      <div class="ghud-center"><div class="glevel">SAVE DATA</div></div>
+      <div class="ghud-side"></div>
     </div>
     <div class="hint">Back up your progress before reinstalling, restore it after, or jump straight to a level.</div>
     <div class="sd-scroll">
@@ -518,18 +520,18 @@
 
   <!-- ===== LEVEL SELECT ===== -->
   <section id="levels" class="stage" hidden>
-    <div class="bar">
-      <button class="iconbtn" id="lvBack">‹ Back</button>
-      <div class="spacer"></div>
-      <div class="pill" id="lvTitle">Ball Sort</div>
-      <div class="pill gold">★ <span id="lvStars">0</span></div>
+    <div class="ghud">
+      <div class="ghud-side"><button class="gbtn" id="lvBack" title="Back">‹</button></div>
+      <div class="ghud-center">
+        <div class="glevel" id="lvTitle">Ball Sort</div>
+        <div class="gstat">★ <span id="lvStars">0</span></div>
+      </div>
+      <div class="ghud-side">
+        <button class="gbtn ghost" id="lvPrev" title="Previous page">‹</button>
+        <button class="gbtn ghost" id="lvNext" title="Next page">›</button>
+      </div>
     </div>
-    <div class="bar" style="margin-bottom:4px;">
-      <button class="iconbtn" id="lvPrev">‹</button>
-      <div class="pill" id="lvRange">1–100</div>
-      <button class="iconbtn" id="lvNext">›</button>
-      <div class="spacer"></div>
-    </div>
+    <div class="hint" id="lvRange">1–100</div>
     <div class="lvgrid" id="lvgrid"></div>
   </section>
 </div>
@@ -1251,6 +1253,25 @@ const Escape = (()=>{
     const occ=new Set(), out=new Map();
     const emptyCells=()=>cells.filter(([q,r])=>ground.has(k(q,r)) && !occ.has(k(q,r)));
 
+    // interior cells get placed first (low placement index), boundary cells last (high index).
+    // a piece's ray to the edge passes through cells that mostly haven't been placed yet when
+    // it's interior and early -- exactly the ones a later placement can safely land on and
+    // depend on. Placing edge-in instead would do the opposite: long interior rays would run
+    // through cells that are already-placed and lower-indexed, which can never be safe blockers.
+    let cq=0, cr=0; for(const [q,r] of cells){ cq+=q; cr+=r; } cq/=cells.length; cr/=cells.length;
+    const centerDist=(q,r)=>Math.abs(q-cq)+Math.abs(r-cr)+Math.abs((q-cq)+(r-cr));
+    function pickInteriorFirst(opts){
+      if(opts.length<=1) return opts[0];
+      let best=opts[0], bestD=centerDist(opts[0][0],opts[0][1]);
+      const sampleN=Math.min(opts.length,5);
+      for(let s=1;s<sampleN;s++){
+        const c=opts[(rnd()*opts.length)|0];
+        const d=centerDist(c[0],c[1]);
+        if(d<bestD){ best=c; bestD=d; }
+      }
+      return best;
+    }
+
     for(let i=0;i<nPivots;i++){
       const opts=emptyCells().filter(([q,r])=>ringOf(q,r).every(([a,b])=>ground.has(k(a,b)))
         && ringOf(q,r).every(([a,b])=>{ const o=out.get(k(a,b)); return !o || o.type!=='pivot'; }));
@@ -1282,7 +1303,7 @@ const Escape = (()=>{
     // instead of every planted piece being its own independent, likely-free coin flip.
     function plantChain(q,r,d,depth,force){
       if(depth<=0 || placed>=n) return;
-      if(!force && rnd()>=0.87) return;
+      if(!force && rnd()>=0.93) return;
       const {dq,dr}=DIRS[d];
       let x=q+dq, y=r+dr;
       while(ground.has(k(x,y))){
@@ -1303,13 +1324,13 @@ const Escape = (()=>{
     }
     while(placed<n && guard++ < n*600){
       const opts=emptyCells(); if(!opts.length) break;
-      const [q,r]=opts[(rnd()*opts.length)|0];
+      const [q,r]=pickInteriorFirst(opts);
       const d=(rnd()*6)|0;
       if(!pathClear(occ,q,r,d)) continue;
       const key=k(q,r);
       out.set(key,{type:'normal',q,r,d,c:(rnd()*8)|0});
       occ.add(key); order.push(key); placed++;
-      plantChain(q,r,d,8,true);
+      plantChain(q,r,d,26,true);
     }
 
     // a piece placed early has nothing to run into yet, so left alone most of the board would
